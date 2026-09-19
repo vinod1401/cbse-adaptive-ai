@@ -23,6 +23,9 @@ export interface IRTItem {
 }
 
 export interface StudentIRTProfile {
+  studentId?: string;
+  rollNo?: string;
+  section?: string;
   theta: number; // Current estimated ability (-3.0 to +3.0)
   standardError: number; // Uncertainty in ability
   itemsAttempted: number;
@@ -136,6 +139,9 @@ export function updateStudentAbility(
   ];
 
   return {
+    studentId: currentProfile.studentId,
+    rollNo: currentProfile.rollNo,
+    section: currentProfile.section,
     theta: Number(newTheta.toFixed(3)),
     standardError: Number(newSE.toFixed(3)),
     itemsAttempted,

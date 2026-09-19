@@ -1,6 +1,7 @@
 // ============================================================================
 // SERVER-SIDE STUDENT RECORDS STORE
 // Stores authenticated, server-verified student performance records.
+// Supports both in-memory caching and persistent Upstash Redis / Vercel KV REST.
 // ============================================================================
 
 import { StudentPerformanceRecord } from "@/lib/student-session";
@@ -98,7 +99,7 @@ declare global {
   var __pragatiStudentRecordsStore: Map<string, StudentPerformanceRecord> | undefined;
 }
 
-function getStore(): Map<string, StudentPerformanceRecord> {
+function getMemoryStore(): Map<string, StudentPerformanceRecord> {
   if (!globalThis.__pragatiStudentRecordsStore) {
     const store = new Map<string, StudentPerformanceRecord>();
     BASELINE_ROSTER.forEach((rec) => store.set(rec.id, rec));
@@ -107,12 +108,69 @@ function getStore(): Map<string, StudentPerformanceRecord> {
   return globalThis.__pragatiStudentRecordsStore;
 }
 
+// Upstash Redis / Vercel KV REST Helper
+const KV_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+async function redisCommand(args: (string | number)[]): Promise<any> {
+  if (!KV_URL || !KV_TOKEN) return null;
+  try {
+    const res = await fetch(KV_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${KV_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(args),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.result;
+  } catch {
+    return null;
+  }
+}
+
 export async function saveStudentRecord(record: StudentPerformanceRecord): Promise<void> {
-  const store = getStore();
+  // 1. In-memory store
+  const store = getMemoryStore();
   store.set(record.id, record);
+
+  // 2. Cloud KV persistence (if configured)
+  await redisCommand(["SET", `record:${record.id}`, JSON.stringify(record)]);
+  await redisCommand(["SADD", "cbse_student_record_ids", record.id]);
 }
 
 export async function getAllStudentRecords(): Promise<StudentPerformanceRecord[]> {
-  const store = getStore();
-  return Array.from(store.values());
+  const store = getMemoryStore();
+  const map = new Map<string, StudentPerformanceRecord>();
+
+  // Base roster
+  BASELINE_ROSTER.forEach((rec) => map.set(rec.id, rec));
+
+  // In-memory records
+  store.forEach((rec) => map.set(rec.id, rec));
+
+  // Cloud KV records (if available)
+  const remoteIds = await redisCommand(["SMEMBERS", "cbse_student_record_ids"]);
+  if (Array.isArray(remoteIds) && remoteIds.length > 0) {
+    const keys = remoteIds.map((id) => `record:${id}`);
+    const remoteData = await redisCommand(["MGET", ...keys]);
+    if (Array.isArray(remoteData)) {
+      remoteData.forEach((raw) => {
+        if (raw) {
+          try {
+            const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+            if (parsed && parsed.id) {
+              map.set(parsed.id, parsed);
+              store.set(parsed.id, parsed);
+            }
+          } catch {}
+        }
+      });
+    }
+  }
+
+  return Array.from(map.values());
 }

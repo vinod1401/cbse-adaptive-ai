@@ -6,52 +6,22 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { cookies } from "next/headers";
+import {
+  ADMIN_COOKIE_NAME,
+  SESSION_MAX_AGE_SECONDS,
+  createSignedAdminToken,
+  verifyAdminToken,
+} from "@/lib/admin-auth";
 
-const AUTH_SECRET = process.env.AUTH_SECRET || "pragati-cbse-adaptive-admin-secret-key-2026";
 const DEFAULT_TEACHER_PIN = process.env.TEACHER_ADMIN_PIN || "1234";
-const COOKIE_NAME = "pragati_admin_session";
-const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12; // 12 hours
-
-// Sign an admin session token
-function createSignedToken(): string {
-  const payload = {
-    role: "teacher_admin",
-    issuedAt: Date.now(),
-    expiresAt: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
-  };
-  const data = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const signature = crypto.createHmac("sha256", AUTH_SECRET).update(data).digest("base64url");
-  return `${data}.${signature}`;
-}
-
-// Verify an admin session token
-function verifySignedToken(token: string): boolean {
-  if (!token || !token.includes(".")) return false;
-  const [data, signature] = token.split(".");
-  const expectedSignature = crypto.createHmac("sha256", AUTH_SECRET).update(data).digest("base64url");
-
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-    return false;
-  }
-
-  try {
-    const payload = JSON.parse(Buffer.from(data, "base64url").toString("utf8"));
-    if (payload.expiresAt < Date.now()) {
-      return false; // Expired
-    }
-    return payload.role === "teacher_admin";
-  } catch {
-    return false;
-  }
-}
 
 // GET: Verify authentication state
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIE_NAME)?.value;
+    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
 
-    if (token && verifySignedToken(token)) {
+    if (token && verifyAdminToken(token)) {
       return NextResponse.json({ authenticated: true });
     }
     return NextResponse.json({ authenticated: false });
@@ -81,9 +51,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Invalid Teacher PIN" }, { status: 401 });
     }
 
-    const token = createSignedToken();
+    const token = createSignedAdminToken();
     const cookieStore = await cookies();
-    cookieStore.set(COOKIE_NAME, token, {
+    cookieStore.set(ADMIN_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -102,7 +72,7 @@ export async function POST(request: Request) {
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
-    cookieStore.delete(COOKIE_NAME);
+    cookieStore.delete(ADMIN_COOKIE_NAME);
     return NextResponse.json({ success: true, message: "Logged out" });
   } catch (error) {
     return NextResponse.json({ success: false }, { status: 500 });

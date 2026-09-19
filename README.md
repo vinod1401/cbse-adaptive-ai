@@ -63,9 +63,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. Push this folder to a GitHub repository.
 2. Go to [vercel.com](https://vercel.com/) and click **"Add New Project"**.
-3. Import your repository and add `GEMINI_API_KEY` under Environment Variables.
+3. Import your repository and configure the following Environment Variables:
+   - `GEMINI_API_KEY`: Your Google AI Studio Gemini API key.
+   - `AUTH_SECRET`: Random 32-character secret for teacher session HMAC (`openssl rand -base64 32`).
+   - `PROFILE_SIGN_SECRET`: Random 32-character secret for student profile anti-tamper signatures.
+   - `TEACHER_ADMIN_PIN`: Admin PIN for teacher dashboard (default: `1234`).
+   - *(Optional for multi-instance distributed serverless)*:
+     - `UPSTASH_REDIS_REST_URL` & `UPSTASH_REDIS_REST_TOKEN`: 1-click free Upstash Redis database via Vercel Storage tab (zero-cost tier).
 4. Click **"Deploy"**.
-5. Your app is live at a global HTTPS URL (e.g. `https://pragati-ai.vercel.app`) with **₹0/month lifetime cost**!
+5. Your app is live at a global HTTPS URL (e.g. `https://cbse-adaptive-ai-2.vercel.app`) with **₹0/month lifetime cost**!
 
 ---
 

@@ -163,6 +163,8 @@ function PracticeContent() {
         }
       } catch (e) {}
 
+      const std = studentProfile || getSavedStudentProfile();
+
       try {
         const res = await fetch("/api/adaptive", {
           method: "POST",
@@ -172,6 +174,7 @@ function PracticeContent() {
             topicId,
             currentProfile: localProfile,
             seenIds: [],
+            student: std ? { studentId: std.id, rollNo: std.rollNo, section: std.section } : undefined,
           }),
         });
         const data = await res.json();
@@ -210,6 +213,8 @@ function PracticeContent() {
 
     const timeTakenSeconds = Math.round((Date.now() - startTime) / 1000);
 
+    const std = studentProfile || getSavedStudentProfile();
+
     try {
       // NOTE: Send BOTH action: "submit" AND action: "grade" compatible payload
       const res = await fetch("/api/adaptive", {
@@ -226,6 +231,7 @@ function PracticeContent() {
           signature: profileSignature,
           seenIds,
           timeTakenSeconds,
+          student: std ? { studentId: std.id, rollNo: std.rollNo, section: std.section } : undefined,
         }),
       });
 

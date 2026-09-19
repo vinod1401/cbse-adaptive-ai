@@ -24,12 +24,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // STRICT SECURITY: Cryptographically verify profile against tampering
+    // STRICT SECURITY: Cryptographically verify profile and student identity against tampering
     const irtProfile: StudentIRTProfile = profile;
-    const isValid = verifyProfileSignature(irtProfile, signature);
+    const isValid = verifyProfileSignature(irtProfile, signature, {
+      studentId: student.studentId,
+      rollNo: student.rollNo,
+      section: student.section,
+    });
     if (!isValid) {
       return NextResponse.json(
-        { error: "Security violation: Student profile signature mismatch or tampered score parameters." },
+        { error: "Security violation: Student profile signature mismatch or identity tampering. Scores cannot be attributed to another student." },
         { status: 403 }
       );
     }

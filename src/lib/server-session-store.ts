@@ -8,7 +8,7 @@
 // - Replay rejection: once an item is evaluated, all subsequent requests
 //   for that item in the same session return 409 Conflict.
 // - High-performance in-memory store with automatic TTL eviction (4 hours)
-// - Optional Upstash Redis / Vercel KV REST adapter when env vars are present
+// - Native Upstash Redis / Vercel KV REST adapter (zero external dependencies)
 // ============================================================================
 
 export interface ServerSessionData {
@@ -20,7 +20,8 @@ export interface ServerSessionData {
   updatedAt: number;
 }
 
-const SESSION_TTL_MS = 1000 * 60 * 60 * 4; // 4 hours
+const SESSION_TTL_SECONDS = 60 * 60 * 4; // 4 hours
+const SESSION_TTL_MS = SESSION_TTL_SECONDS * 1000;
 
 // Global in-memory session registry (persists across requests in Node process)
 declare global {
@@ -46,36 +47,42 @@ function cleanupExpiredSessions(): void {
   }
 }
 
-// Optional Upstash / Vercel KV REST Helper
+// Upstash Redis / Vercel KV REST Helper
 const KV_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
-async function kvGet(key: string): Promise<ServerSessionData | null> {
+async function redisCommand(args: (string | number)[]): Promise<any> {
   if (!KV_URL || !KV_TOKEN) return null;
   try {
-    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
+    const res = await fetch(KV_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${KV_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(args),
       cache: "no-store",
     });
     if (!res.ok) return null;
     const json = await res.json();
-    if (!json.result) return null;
-    return typeof json.result === "string" ? JSON.parse(json.result) : json.result;
+    return json.result;
   } catch {
     return null;
   }
 }
 
-async function kvSet(key: string, value: ServerSessionData, ttlSeconds: number = 14400): Promise<void> {
-  if (!KV_URL || !KV_TOKEN) return;
+async function kvGet(key: string): Promise<ServerSessionData | null> {
+  const result = await redisCommand(["GET", key]);
+  if (!result) return null;
   try {
-    await fetch(`${KV_URL}/set/${encodeURIComponent(key)}/${encodeURIComponent(JSON.stringify(value))}?ex=${ttlSeconds}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
-      cache: "no-store",
-    });
+    return typeof result === "string" ? JSON.parse(result) : result;
   } catch {
-    // Graceful fallback to memory store
+    return null;
   }
+}
+
+async function kvSet(key: string, value: ServerSessionData, ttlSeconds: number = SESSION_TTL_SECONDS): Promise<void> {
+  await redisCommand(["SET", key, JSON.stringify(value), "EX", ttlSeconds]);
 }
 
 /**
@@ -142,7 +149,6 @@ export async function consumeItem(
 ): Promise<void> {
   let session = await getServerSession(sessionId);
   if (!session) {
-    // If session wasn't explicitly initialized in memory (e.g. server restart), create it
     session = {
       sessionId,
       topicId: "",

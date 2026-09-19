@@ -81,16 +81,27 @@ export async function POST(request: Request) {
     const targetItemId = itemId || questionId;
 
     const topic = getTopicById(topicId) || CONCEPT_BANK[0];
+    const student = body.student || {
+      studentId: currentProfile?.studentId,
+      rollNo: currentProfile?.rollNo,
+      section: currentProfile?.section,
+    };
     const seenSet = new Set<string>(seenIds);
 
     if (action === "start") {
       const profile: StudentIRTProfile = currentProfile || {
+        studentId: student?.studentId,
+        rollNo: student?.rollNo,
+        section: student?.section,
         theta: INITIAL_THETA,
         standardError: INITIAL_SE,
         itemsAttempted: 0,
         correctCount: 0,
         history: [],
       };
+      if (student?.studentId) profile.studentId = student.studentId;
+      if (student?.rollNo) profile.rollNo = student.rollNo;
+      if (student?.section) profile.section = student.section;
 
       const initialItem = selectNextOptimalItem(profile.theta, topic.items, seenSet);
 
@@ -133,7 +144,7 @@ export async function POST(request: Request) {
         topic: { id: topic.id, title: topic.title, chapter: topic.chapter, subject: topic.subject },
         item: safeItem,
         profile,
-        signature: signProfile(profile),
+        signature: signProfile(profile, student),
         masteryPct: thetaToMasteryPercentage(profile.theta),
         tier: getMasteryTier(profile.theta),
       });
@@ -191,7 +202,7 @@ export async function POST(request: Request) {
       };
 
       // Anti-Cheat (Finding 2): Cryptographic signature verification on EVERY submit (including item #1)
-      const isValidSig = verifyProfileSignature(profile, body.signature);
+      const isValidSig = verifyProfileSignature(profile, body.signature, student);
       if (!isValidSig) {
         return NextResponse.json(
           { error: "Security violation: Student profile signature mismatch or tampered ability parameters." },
@@ -272,7 +283,7 @@ export async function POST(request: Request) {
         correctAnswer: currentItem.correctAnswer,
         misconception,
         profile: updatedProfile,
-        signature: signProfile(updatedProfile),
+        signature: signProfile(updatedProfile, student),
         masteryPct: thetaToMasteryPercentage(updatedProfile.theta),
         tier: getMasteryTier(updatedProfile.theta),
         nextItem: safeNextItem,
