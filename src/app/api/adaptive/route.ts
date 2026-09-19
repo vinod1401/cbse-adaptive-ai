@@ -1,8 +1,15 @@
 // ============================================================================
 // SERVER-SIDE ADAPTIVE IRT API (Anti-Cheat & Psychometric Calibration)
+// Features:
+// - Cryptographic HMAC-SHA256 Profile Signatures against score tampering
+// - Server-Authoritative HTTP-Only Session Cookie preventing replay attacks
+// - Strict Per-Item Submission Lock preventing brute-force answer fishing
+// - Server-Side Option Shuffling & Answer Key Stripping
 // ============================================================================
 
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 import {
   StudentIRTProfile,
   INITIAL_THETA,
@@ -14,12 +21,23 @@ import {
 } from "@/lib/irt-engine";
 import { generateDynamicAdaptiveQuestion } from "@/lib/gemini";
 import { getTopicById, CONCEPT_BANK } from "@/lib/question-bank";
-import crypto from "crypto";
 
 const PROFILE_SIGN_SECRET = process.env.PROFILE_SIGN_SECRET || "pragati-cbse-student-profile-hmac-salt-2026";
+const SESSION_COOKIE_NAME = "pragati_adaptive_session";
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 4; // 4 hours
 
+interface AdaptiveSessionState {
+  sessionId: string;
+  topicId: string;
+  activeItemId: string;
+  gradedItemIds: string[];
+  createdAt: number;
+}
+
+// Cryptographic HMAC-SHA256 Profile Signing (Bound to itemId and correctness)
 function signProfile(profile: StudentIRTProfile): string {
-  const payload = `${profile.theta.toFixed(4)}:${profile.standardError.toFixed(4)}:${profile.itemsAttempted}:${profile.correctCount}:${(profile.history || []).map((h) => `${h.itemId}_${h.isCorrect}`).join(",")}`;
+  const historyStr = (profile.history || []).map((h) => `${h.itemId}_${h.correct}`).join(",");
+  const payload = `${profile.theta.toFixed(4)}:${profile.standardError.toFixed(4)}:${profile.itemsAttempted}:${profile.correctCount}:${historyStr}`;
   return crypto.createHmac("sha256", PROFILE_SIGN_SECRET).update(payload).digest("hex");
 }
 
@@ -30,6 +48,27 @@ function verifyProfileSignature(profile: StudentIRTProfile, signature: string | 
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
+// Server-Authoritative Session Cookie Signing
+function signSession(data: AdaptiveSessionState): string {
+  const payload = Buffer.from(JSON.stringify(data)).toString("base64url");
+  const signature = crypto.createHmac("sha256", PROFILE_SIGN_SECRET).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+
+function verifySession(token: string | undefined): AdaptiveSessionState | null {
+  if (!token || !token.includes(".")) return null;
+  const [payload, signature] = token.split(".");
+  const expectedSig = crypto.createHmac("sha256", PROFILE_SIGN_SECRET).update(payload).digest("base64url");
+  if (signature.length !== expectedSig.length) return null;
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) return null;
+  try {
+    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+// Fisher-Yates server-side option shuffling
 function shuffleOptions<T>(array: T[]): T[] {
   if (!array || !Array.isArray(array)) return array;
   const arr = [...array];
@@ -66,6 +105,24 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "No questions available" }, { status: 404 });
       }
 
+      // Initialize server-authoritative session state in HTTP-Only signed cookie
+      const sessionState: AdaptiveSessionState = {
+        sessionId: crypto.randomUUID(),
+        topicId: topic.id,
+        activeItemId: initialItem.id,
+        gradedItemIds: [],
+        createdAt: Date.now(),
+      };
+
+      const cookieStore = await cookies();
+      cookieStore.set(SESSION_COOKIE_NAME, signSession(sessionState), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: SESSION_MAX_AGE_SECONDS,
+      });
+
       // STRICT SECURITY: Strip correctAnswer from client payload
       const safeItem = {
         id: initialItem.id,
@@ -87,6 +144,37 @@ export async function POST(request: Request) {
     }
 
     if (action === "submit" || action === "grade") {
+      const cookieStore = await cookies();
+      const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+      const session = verifySession(sessionToken);
+
+      // Require active server session (Finding 4 Replay Defense)
+      if (!session) {
+        return NextResponse.json(
+          { error: "No active adaptive test session found. Please start a new session from the topic menu." },
+          { status: 403 }
+        );
+      }
+
+      // Anti-Cheat (Finding 4): Server-side lock against replay attacks & multiple guesses
+      if (session.gradedItemIds.includes(targetItemId)) {
+        return NextResponse.json(
+          {
+            error: "Item already submitted. Multiple attempts on the same question are locked in adaptive mode.",
+            isDuplicate: true,
+          },
+          { status: 409 }
+        );
+      }
+
+      // Anti-Cheat (Finding 4): Ensure submitted question matches the active question in this session
+      if (session.activeItemId !== targetItemId) {
+        return NextResponse.json(
+          { error: "Invalid submission: Target question is not the active question for this session." },
+          { status: 403 }
+        );
+      }
+
       const currentItem = topic.items.find((it) => it.id === targetItemId);
       if (!currentItem) {
         return NextResponse.json({ error: "Item not found" }, { status: 404 });
@@ -100,28 +188,12 @@ export async function POST(request: Request) {
         history: [],
       };
 
-      // Anti-Cheat (Finding 2): Cryptographic signature verification against client tampering
-      if (profile.itemsAttempted > 0) {
-        const isValid = verifyProfileSignature(profile, body.signature);
-        if (!isValid) {
-          return NextResponse.json(
-            { error: "Security violation: Student profile signature mismatch or tampered ability parameters." },
-            { status: 403 }
-          );
-        }
-      }
-
-      // Submission Lock (Finding 4): Prevent answer-oracle brute-forcing by rejecting duplicate item submissions
-      const alreadyAnswered = profile.history && profile.history.some((h) => h.itemId === targetItemId);
-      if (alreadyAnswered) {
+      // Anti-Cheat (Finding 2): Cryptographic signature verification on EVERY submit (including item #1)
+      const isValidSig = verifyProfileSignature(profile, body.signature);
+      if (!isValidSig) {
         return NextResponse.json(
-          {
-            error: "Item already submitted. Multiple attempts on the same question are locked in adaptive mode.",
-            isDuplicate: true,
-            profile,
-            signature: signProfile(profile),
-          },
-          { status: 409 }
+          { error: "Security violation: Student profile signature mismatch or tampered ability parameters." },
+          { status: 403 }
         );
       }
 
@@ -156,6 +228,17 @@ export async function POST(request: Request) {
           console.warn("Dynamic item fallback notice:", e);
         }
       }
+
+      // Update server session state with graded item and advance activeItemId
+      session.gradedItemIds.push(targetItemId);
+      session.activeItemId = nextItem ? nextItem.id : "";
+      cookieStore.set(SESSION_COOKIE_NAME, signSession(session), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: SESSION_MAX_AGE_SECONDS,
+      });
 
       const safeNextItem = nextItem
         ? {

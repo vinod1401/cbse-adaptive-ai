@@ -28,6 +28,7 @@ import {
   getSavedStudentProfile,
   saveStudentProfile,
 } from "@/lib/student-session";
+import { syncStudentPerformance } from "@/lib/firebase";
 import { getAllTopics, getSubjects, getTopicsBySubject } from "@/lib/topics-metadata";
 
 function PracticeContent() {
@@ -273,7 +274,7 @@ function PracticeContent() {
             accuracyPct: Math.round((totalCorr / totalAtt) * 100),
             lastActive: "Just now",
             flaggedMisconceptions: recMisconceptions,
-          }).catch((err) => console.warn("Background sync info:", err));
+          }).catch((err: any) => console.warn("Background sync info:", err));
         }
       } else {
         alert("Evaluation failed: " + (data.error || "Please try again"));

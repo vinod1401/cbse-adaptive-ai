@@ -294,15 +294,6 @@ export default function AdminDashboardPage() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowChangePinModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 transition-all"
-            title="Change 4-Digit Teacher PIN"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-amber-400" />
-            <span>Change PIN</span>
-          </button>
-
-          <button
             onClick={handleLock}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-rose-300 transition-all"
             title="Lock Dashboard"

@@ -1,5 +1,6 @@
-node_modules 
-.next 
-.vercel 
-*.local 
+node_modules
+.next
+.vercel
+*.local
+*.tsbuildinfo
 build
