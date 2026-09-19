@@ -7,6 +7,10 @@
 
 import { IRTItem } from "./irt-engine";
 
+if (typeof window !== "undefined") {
+  throw new Error("SECURITY VIOLATION: question-bank.ts is strictly server-only and cannot be imported in client-side bundles.");
+}
+
 export interface ConceptTopic {
   id: string;
   subject: string;

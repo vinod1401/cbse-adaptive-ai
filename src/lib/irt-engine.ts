@@ -105,14 +105,19 @@ export function updateStudentAbility(
   const p = calculateProbability(currentProfile.theta, b, a);
   const u = isCorrect ? 1.0 : 0.0;
 
+  // Measurement information gathered so far
   const itemInfo = calculateItemInformation(currentProfile.theta, b, a);
   const currentVariance = Math.max(0.04, Math.pow(currentProfile.standardError, 2));
 
+  // Bayesian update rule: Delta theta proportional to residual (u - p) and current uncertainty
+  // Step dampener prevents wild swings from lucky guesses
   const dampener = Math.min(1.0, 1.5 / Math.sqrt(currentProfile.itemsAttempted + 1));
   const deltaTheta = (u - p) * Math.sqrt(currentVariance) * dampener;
 
+  // Clamp ability to valid psychometric scale [-3.0, +3.0]
   const newTheta = Math.max(-3.0, Math.min(3.0, currentProfile.theta + deltaTheta));
 
+  // Posterior Standard Error decreases with information gained
   const newVariance = 1 / (1 / currentVariance + itemInfo);
   const newSE = Math.max(0.2, Math.sqrt(newVariance));
 
@@ -153,11 +158,13 @@ export function selectNextOptimalItem(
   if (unseen.length === 0) return null;
   const pool = unseen;
 
+  // Rank candidate questions by proximity to student ability |b - theta|
+  // with a small probabilistic temperature (0.15) to prevent identical sequence repetition
   const ranked = pool
     .map((item) => {
       const dist = Math.abs(item.difficulty - theta);
       const info = calculateItemInformation(theta, item.difficulty, item.discrimination || 1.0);
-      const score = info - (Math.random() * 0.05);
+      const score = info - (Math.random() * 0.05); // slight stochastic tie-breaker
       return { item, dist, score };
     })
     .sort((a, b) => b.score - a.score);
@@ -166,9 +173,11 @@ export function selectNextOptimalItem(
 }
 
 /**
- * Converts latent ability theta (-3.0 to +3.0) to a user-friendly mastery percentage (0% to 100%).
+ * Converts latent ability theta (-3.0 to +3.0) to a user-friendly mastery percentage (0% to 100%)
+ * using the standard normal ogive / sigmoid transformation.
  */
 export function thetaToMasteryPercentage(theta: number): number {
+  // Sigmoid mapping centered at theta = 0 (50%)
   const pct = (1 / (1 + Math.exp(-1.1 * theta))) * 100;
   return Math.min(100, Math.max(0, Math.round(pct)));
 }

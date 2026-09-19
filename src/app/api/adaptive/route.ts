@@ -14,6 +14,21 @@ import {
 } from "@/lib/irt-engine";
 import { generateDynamicAdaptiveQuestion } from "@/lib/gemini";
 import { getTopicById, CONCEPT_BANK } from "@/lib/question-bank";
+import crypto from "crypto";
+
+const PROFILE_SIGN_SECRET = process.env.PROFILE_SIGN_SECRET || "pragati-cbse-student-profile-hmac-salt-2026";
+
+function signProfile(profile: StudentIRTProfile): string {
+  const payload = `${profile.theta.toFixed(4)}:${profile.standardError.toFixed(4)}:${profile.itemsAttempted}:${profile.correctCount}:${(profile.history || []).map((h) => `${h.itemId}_${h.isCorrect}`).join(",")}`;
+  return crypto.createHmac("sha256", PROFILE_SIGN_SECRET).update(payload).digest("hex");
+}
+
+function verifyProfileSignature(profile: StudentIRTProfile, signature: string | undefined): boolean {
+  if (!signature) return false;
+  const expected = signProfile(profile);
+  if (signature.length !== expected.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+}
 
 function shuffleOptions<T>(array: T[]): T[] {
   if (!array || !Array.isArray(array)) return array;
@@ -65,6 +80,7 @@ export async function POST(request: Request) {
         topic: { id: topic.id, title: topic.title, chapter: topic.chapter, subject: topic.subject },
         item: safeItem,
         profile,
+        signature: signProfile(profile),
         masteryPct: thetaToMasteryPercentage(profile.theta),
         tier: getMasteryTier(profile.theta),
       });
@@ -76,7 +92,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Item not found" }, { status: 404 });
       }
 
-      const isCorrect = answer === currentItem.correctAnswer;
       const profile: StudentIRTProfile = currentProfile || {
         theta: INITIAL_THETA,
         standardError: INITIAL_SE,
@@ -84,6 +99,33 @@ export async function POST(request: Request) {
         correctCount: 0,
         history: [],
       };
+
+      // Anti-Cheat (Finding 2): Cryptographic signature verification against client tampering
+      if (profile.itemsAttempted > 0) {
+        const isValid = verifyProfileSignature(profile, body.signature);
+        if (!isValid) {
+          return NextResponse.json(
+            { error: "Security violation: Student profile signature mismatch or tampered ability parameters." },
+            { status: 403 }
+          );
+        }
+      }
+
+      // Submission Lock (Finding 4): Prevent answer-oracle brute-forcing by rejecting duplicate item submissions
+      const alreadyAnswered = profile.history && profile.history.some((h) => h.itemId === targetItemId);
+      if (alreadyAnswered) {
+        return NextResponse.json(
+          {
+            error: "Item already submitted. Multiple attempts on the same question are locked in adaptive mode.",
+            isDuplicate: true,
+            profile,
+            signature: signProfile(profile),
+          },
+          { status: 409 }
+        );
+      }
+
+      const isCorrect = answer === currentItem.correctAnswer;
 
       const updatedProfile = updateStudentAbility(
         profile,
@@ -142,6 +184,7 @@ export async function POST(request: Request) {
         correctAnswer: currentItem.correctAnswer,
         misconception,
         profile: updatedProfile,
+        signature: signProfile(updatedProfile),
         masteryPct: thetaToMasteryPercentage(updatedProfile.theta),
         tier: getMasteryTier(updatedProfile.theta),
         nextItem: safeNextItem,

@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { getAllTopics, getSubjects, getTopicsBySubject, ConceptTopic } from "@/lib/question-bank";
+import { getAllTopics, getSubjects, getTopicsBySubject, ConceptTopic } from "@/lib/topics-metadata";
 import { thetaToMasteryPercentage, getMasteryTier } from "@/lib/irt-engine";
 import { MathRenderer } from "@/components/MathRenderer";
 import { getSavedStudentProfile, StudentProfile } from "@/lib/student-session";

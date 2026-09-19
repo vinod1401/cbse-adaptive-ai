@@ -28,8 +28,7 @@ import {
   getSavedStudentProfile,
   saveStudentProfile,
 } from "@/lib/student-session";
-import { syncStudentPerformance } from "@/lib/firebase";
-import { getAllTopics, getSubjects, getTopicsBySubject } from "@/lib/question-bank";
+import { getAllTopics, getSubjects, getTopicsBySubject } from "@/lib/topics-metadata";
 
 function PracticeContent() {
   const router = useRouter();
@@ -51,6 +50,7 @@ function PracticeContent() {
   const [topicMeta, setTopicMeta] = useState<any>(null);
   const [currentItem, setCurrentItem] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [profileSignature, setProfileSignature] = useState<string>("");
   const [masteryPct, setMasteryPct] = useState<number>(50);
   const [tier, setTier] = useState<any>({ label: "Proficient", badge: "🟡 Proficient" });
 
@@ -92,9 +92,18 @@ function PracticeContent() {
     const cleanText = currentItem.text
       .replace(/\$([^\$]+)\$/g, "$1")
       .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "$1 divided by $2")
-      .replace(/\\times/g, "multiplied by")
-      .replace(/\\div/g, "divided by")
-      .replace(/[\\{}^_]/g, "");
+      .replace(/\\times/g, " multiplied by ")
+      .replace(/\\div/g, " divided by ")
+      .replace(/\\sqrt\{([^}]+)\}/g, "square root of $1")
+      .replace(/\^2/g, " squared")
+      .replace(/\^3/g, " cubed")
+      .replace(/\^([0-9]+)/g, " to the power of $1")
+      .replace(/\\neq/g, " is not equal to ")
+      .replace(/\\leq/g, " is less than or equal to ")
+      .replace(/\\geq/g, " is greater than or equal to ")
+      .replace(/\\pm/g, " plus or minus ")
+      .replace(/\^\\circ/g, " degrees")
+      .replace(/[\\{}_]/g, "");
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     const isDevanagari = /[\u0900-\u097F]/.test(cleanText);
@@ -169,6 +178,7 @@ function PracticeContent() {
           setTopicMeta(data.topic);
           setCurrentItem(data.item);
           setProfile(data.profile);
+          if (data.signature) setProfileSignature(data.signature);
           setMasteryPct(data.masteryPct);
           setTier(data.tier);
           setStartTime(Date.now());
@@ -212,6 +222,7 @@ function PracticeContent() {
           selectedAnswer: selectedOption,
           selectedOption: selectedOption,
           currentProfile: profile,
+          signature: profileSignature,
           seenIds,
           timeTakenSeconds,
         }),
@@ -221,6 +232,7 @@ function PracticeContent() {
       if (res.ok) {
         setFeedback(data);
         setProfile(data.profile);
+        if (data.signature) setProfileSignature(data.signature);
         setMasteryPct(data.masteryPct);
         setTier(data.tier);
         persistProfile(data.profile);

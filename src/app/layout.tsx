@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { Brain, Flame, Sparkles } from "lucide-react";
+import { Brain, Flame, Sparkles, Trophy } from "lucide-react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +26,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} min-h-screen bg-slate-950 flex flex-col`}>
+        {/* Modern Top Header */}
         <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group">
@@ -42,6 +43,7 @@ export default function RootLayout({
               </div>
             </Link>
 
+            {/* Quick Stats Widget */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
                 <Flame className="w-4 h-4 text-amber-400 animate-bounce" />
@@ -56,10 +58,12 @@ export default function RootLayout({
           </div>
         </header>
 
+        {/* Main Body */}
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
           {children}
         </main>
 
+        {/* Footer */}
         <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
           <p>Powered by IRT Psychometrics & Google Gemini AI Flash · 100% Free & Open-Source Architecture</p>
         </footer>

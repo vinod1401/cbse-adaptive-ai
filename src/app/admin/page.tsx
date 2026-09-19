@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { getAllTopics } from "@/lib/question-bank";
+import { getAllTopics } from "@/lib/topics-metadata";
 import { getThetaConfidenceInterval } from "@/lib/irt-engine";
 import {
   Brain,
@@ -44,10 +44,6 @@ export default function AdminDashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
-  const [showChangePinModal, setShowChangePinModal] = useState(false);
-  const [newPin, setNewPin] = useState("");
-  const [confirmPin, setConfirmPin] = useState("");
-  const [pinSuccessMsg, setPinSuccessMsg] = useState("");
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,69 +51,47 @@ export default function AdminDashboardPage() {
   const [selectedTier, setSelectedTier] = useState("ALL");
   const [selectedStudentModal, setSelectedStudentModal] = useState<StudentPerformanceRecord | null>(null);
 
-  // Check PIN auth on mount
+  // Check server-verified PIN auth on mount
   useEffect(() => {
-    try {
-      const auth = sessionStorage.getItem("pragati_teacher_auth");
-      if (auth === "true") {
-        setIsAuthenticated(true);
-      }
-    } catch (e) {}
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/admin/auth");
+        const data = await res.json();
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+        }
+      } catch (e) {}
+    }
+    checkAuth();
   }, []);
 
-  const getSavedPin = () => {
-    try {
-      return localStorage.getItem("pragati_admin_pin") || "1234";
-    } catch (e) {
-      return "1234";
-    }
-  };
-
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = getSavedPin();
-    if (pinInput.trim() === correctPin) {
-      setIsAuthenticated(true);
-      try {
-        sessionStorage.setItem("pragati_teacher_auth", "true");
-      } catch (e) {}
-      setPinError("");
-      setPinInput("");
-    } else {
-      setPinError("Incorrect PIN. Default PIN is 1234.");
+    setPinError("");
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: pinInput }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsAuthenticated(true);
+        setPinError("");
+        setPinInput("");
+      } else {
+        setPinError(data.error || "Incorrect PIN. Default PIN is 1234.");
+      }
+    } catch (e) {
+      setPinError("Connection error during verification.");
     }
   };
 
-  const handleLock = () => {
+  const handleLock = async () => {
     setIsAuthenticated(false);
     try {
-      sessionStorage.removeItem("pragati_teacher_auth");
+      await fetch("/api/admin/auth", { method: "DELETE" });
     } catch (e) {}
-  };
-
-  const handleChangePin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-      setPinError("PIN must be exactly 4 digits.");
-      return;
-    }
-    if (newPin !== confirmPin) {
-      setPinError("PINs do not match.");
-      return;
-    }
-    try {
-      localStorage.setItem("pragati_admin_pin", newPin);
-      setPinSuccessMsg("PIN changed successfully!");
-      setTimeout(() => {
-        setShowChangePinModal(false);
-        setPinSuccessMsg("");
-        setNewPin("");
-        setConfirmPin("");
-        setPinError("");
-      }, 1500);
-    } catch (e) {
-      setPinError("Failed to save PIN.");
-    }
   };
 
   const loadStudentRecords = async () => {
@@ -255,7 +229,7 @@ export default function AdminDashboardPage() {
           </form>
 
           <div className="pt-2 border-t border-slate-800/80 text-xs text-slate-500">
-            <span>Default PIN is <strong className="text-slate-300 font-mono">1234</strong> (You can change it once logged in).</span>
+            <span>Protected by Server-Side Teacher Authentication (Default PIN: <strong className="text-slate-300 font-mono">1234</strong>).</span>
           </div>
 
           <Link href="/" className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors">

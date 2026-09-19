@@ -1,6 +1,6 @@
 // ============================================================================
 // GEMINI SOCRATIC AI TUTOR — Google GenAI SDK (Zero-Cost Free Tier)
-// Model: gemini-3.8-flash via @google/genai
+// Model: gemini-3.8-flash (or gemini-flash-latest) via @google/genai
 // ============================================================================
 
 import { GoogleGenAI } from "@google/genai";
@@ -16,9 +16,13 @@ export interface SocraticHintRequest {
   selectedWrongAnswer?: string;
 }
 
+/**
+ * Generates an intelligent, step-by-step Socratic hint without giving away the answer.
+ */
 export async function generateSocraticHint(params: SocraticHintRequest): Promise<string> {
   const { topic, questionText, options, hintLevel, selectedWrongAnswer } = params;
 
+  // Fallback if no API key is set yet (ensures zero crashes)
   if (!client) {
     if (selectedWrongAnswer) {
       return `💡 Notice what happened when you selected ${selectedWrongAnswer}. Remember the core rule in ${topic}: check if your signs or denominators need careful adjustment first!`;
@@ -53,12 +57,24 @@ Provide the Socratic Hint now:
 
   try {
     const interaction = await client.interactions.create({
-      model: "gemini-3.8-flash",
+      model: "gemini-2.5-flash",
       input: prompt,
       tools: [],
+      // System instructions are interaction-scoped in current SDK
     });
 
-    return interaction.output_text || "Think carefully about the properties of this concept. What is the first step?";
+    let hint = interaction.output_text?.trim() || "Think carefully about the core properties of this concept. What is the first step?";
+    
+    // Safety Guardrail (Finding 9): Ensure the model does not inadvertently blurt out a direct answer
+    for (const opt of options) {
+      const directLeak = new RegExp(`(answer\\s+is|correct\\s+option\\s+is|choose)\\s+["']?${opt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']?`, "i");
+      if (directLeak.test(hint)) {
+        hint = "💡 Consider the underlying rule for this topic. Which fundamental formula or relation applies here?";
+        break;
+      }
+    }
+
+    return hint;
   } catch (error) {
     console.error("Gemini API Tutor Error:", error);
     return "💡 Concept Tip: Break the equation down step-by-step. Remember that what you do to one side must be done to the other!";
