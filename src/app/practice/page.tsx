@@ -274,6 +274,8 @@ function PracticeContent() {
             accuracyPct: Math.round((totalCorr / totalAtt) * 100),
             lastActive: "Just now",
             flaggedMisconceptions: recMisconceptions,
+            profile: data.profile,
+            signature: data.signature,
           }).catch((err: any) => console.warn("Background sync info:", err));
         }
       } else {

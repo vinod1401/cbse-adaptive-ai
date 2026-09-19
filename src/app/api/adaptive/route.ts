@@ -2,8 +2,8 @@
 // SERVER-SIDE ADAPTIVE IRT API (Anti-Cheat & Psychometric Calibration)
 // Features:
 // - Cryptographic HMAC-SHA256 Profile Signatures against score tampering
-// - Server-Authoritative HTTP-Only Session Cookie preventing replay attacks
-// - Strict Per-Item Submission Lock preventing brute-force answer fishing
+// - Server-Authoritative HTTP-Only Session Cookie
+// - Server-Side Single-Use Tracking (Eliminates curl / captured cookie replay attacks)
 // - Server-Side Option Shuffling & Answer Key Stripping
 // ============================================================================
 
@@ -21,6 +21,13 @@ import {
 } from "@/lib/irt-engine";
 import { generateDynamicAdaptiveQuestion } from "@/lib/gemini";
 import { getTopicById, CONCEPT_BANK } from "@/lib/question-bank";
+import { signProfile, verifyProfileSignature } from "@/lib/profile-signer";
+import {
+  recordSessionStart,
+  isItemConsumed,
+  consumeItem,
+  getActiveItem,
+} from "@/lib/server-session-store";
 
 const PROFILE_SIGN_SECRET = process.env.PROFILE_SIGN_SECRET || "pragati-cbse-student-profile-hmac-salt-2026";
 const SESSION_COOKIE_NAME = "pragati_adaptive_session";
@@ -32,20 +39,6 @@ interface AdaptiveSessionState {
   activeItemId: string;
   gradedItemIds: string[];
   createdAt: number;
-}
-
-// Cryptographic HMAC-SHA256 Profile Signing (Bound to itemId and correctness)
-function signProfile(profile: StudentIRTProfile): string {
-  const historyStr = (profile.history || []).map((h) => `${h.itemId}_${h.correct}`).join(",");
-  const payload = `${profile.theta.toFixed(4)}:${profile.standardError.toFixed(4)}:${profile.itemsAttempted}:${profile.correctCount}:${historyStr}`;
-  return crypto.createHmac("sha256", PROFILE_SIGN_SECRET).update(payload).digest("hex");
-}
-
-function verifyProfileSignature(profile: StudentIRTProfile, signature: string | undefined): boolean {
-  if (!signature) return false;
-  const expected = signProfile(profile);
-  if (signature.length !== expected.length) return false;
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
 // Server-Authoritative Session Cookie Signing
@@ -105,7 +98,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "No questions available" }, { status: 404 });
       }
 
-      // Initialize server-authoritative session state in HTTP-Only signed cookie
+      // Initialize session state
       const sessionState: AdaptiveSessionState = {
         sessionId: crypto.randomUUID(),
         topicId: topic.id,
@@ -113,6 +106,9 @@ export async function POST(request: Request) {
         gradedItemIds: [],
         createdAt: Date.now(),
       };
+
+      // CRITICAL: Register session in authoritative server-side store
+      await recordSessionStart(sessionState.sessionId, topic.id, initialItem.id);
 
       const cookieStore = await cookies();
       cookieStore.set(SESSION_COOKIE_NAME, signSession(sessionState), {
@@ -148,7 +144,7 @@ export async function POST(request: Request) {
       const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
       const session = verifySession(sessionToken);
 
-      // Require active server session (Finding 4 Replay Defense)
+      // Require active server session
       if (!session) {
         return NextResponse.json(
           { error: "No active adaptive test session found. Please start a new session from the topic menu." },
@@ -156,19 +152,25 @@ export async function POST(request: Request) {
         );
       }
 
-      // Anti-Cheat (Finding 4): Server-side lock against replay attacks & multiple guesses
-      if (session.gradedItemIds.includes(targetItemId)) {
+      // Anti-Cheat (Finding 4 Replay Defense): Check server-authoritative single-use ledger.
+      // Defeats curl/automated replays where the attacker resubmits captured cookies.
+      const alreadyConsumedOnServer = await isItemConsumed(session.sessionId, targetItemId);
+      if (alreadyConsumedOnServer || session.gradedItemIds.includes(targetItemId)) {
         return NextResponse.json(
           {
-            error: "Item already submitted. Multiple attempts on the same question are locked in adaptive mode.",
+            error: "Item already evaluated and consumed for this session. Replay attempt rejected.",
             isDuplicate: true,
           },
           { status: 409 }
         );
       }
 
-      // Anti-Cheat (Finding 4): Ensure submitted question matches the active question in this session
-      if (session.activeItemId !== targetItemId) {
+      // Anti-Cheat: Ensure submitted question matches the active question for this session
+      const serverActiveItem = await getActiveItem(session.sessionId);
+      if (
+        (serverActiveItem && serverActiveItem !== targetItemId) ||
+        (session.activeItemId && session.activeItemId !== targetItemId)
+      ) {
         return NextResponse.json(
           { error: "Invalid submission: Target question is not the active question for this session." },
           { status: 403 }
@@ -229,7 +231,10 @@ export async function POST(request: Request) {
         }
       }
 
-      // Update server session state with graded item and advance activeItemId
+      // CRITICAL REPLAY DEFENSE: Consume item immediately in authoritative server store
+      await consumeItem(session.sessionId, targetItemId, nextItem ? nextItem.id : "");
+
+      // Update server session cookie state
       session.gradedItemIds.push(targetItemId);
       session.activeItemId = nextItem ? nextItem.id : "";
       cookieStore.set(SESSION_COOKIE_NAME, signSession(session), {
