@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { getAllTopics, getSubjects, getTopicsBySubject, ConceptTopic } from "@/lib/topics-metadata";
 import { thetaToMasteryPercentage, getMasteryTier } from "@/lib/irt-engine";
 import { MathRenderer } from "@/components/MathRenderer";
@@ -244,7 +245,7 @@ export default function HomePage() {
                   <div className="pt-5 mt-5 border-t border-slate-800/60 space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400 font-medium">Question Bank:</span>
-                      <span className="text-indigo-400 font-mono font-bold">{topic.items.length} Calibrated Items</span>
+                      <span className="text-indigo-400 font-mono font-bold">{topic.itemCount || 17} Calibrated Items</span>
                     </div>
 
                     <Link

@@ -669,7 +669,7 @@ function PracticeContent() {
                         }`}
                       >
                         <span className="font-bold text-white line-clamp-1">{t.title}</span>
-                        <span className="text-[11px] text-slate-500 mt-1 font-mono">{t.items.length} calibrated questions</span>
+                        <span className="text-[11px] text-slate-500 mt-1 font-mono">{t.itemCount || 17} calibrated questions</span>
                       </button>
                     ))}
                   </div>

@@ -503,7 +503,7 @@ export default function AdminDashboardPage() {
             <div key={t.id} className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-2">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-indigo-400 font-bold uppercase tracking-wider">{t.subject}</span>
-                <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">{t.items.length} items</span>
+                <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">{t.itemCount || 17} items</span>
               </div>
               <h4 className="text-sm font-semibold text-white line-clamp-1">{t.title}</h4>
               <p className="text-xs text-slate-400 line-clamp-2">{t.description}</p>
@@ -511,67 +511,6 @@ export default function AdminDashboardPage() {
           ))}
         </div>
       </div>
-
-      {/* Change PIN Modal */}
-      {showChangePinModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
-              <KeyRound className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Change 4-Digit Teacher PIN</h3>
-            <p className="text-xs text-slate-400">Set a new secret PIN to protect student records from unauthorized viewing.</p>
-
-            <form onSubmit={handleChangePin} className="space-y-3 pt-2 text-left">
-              <div>
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1">New 4-Digit PIN</label>
-                <input
-                  type="password"
-                  maxLength={4}
-                  value={newPin}
-                  onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
-                  placeholder="Enter 4 digits"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-center font-mono text-lg focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1">Confirm New PIN</label>
-                <input
-                  type="password"
-                  maxLength={4}
-                  value={confirmPin}
-                  onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ""))}
-                  placeholder="Re-enter 4 digits"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-center font-mono text-lg focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              {pinError && <p className="text-xs text-rose-400">{pinError}</p>}
-              {pinSuccessMsg && <p className="text-xs text-emerald-400 font-semibold">{pinSuccessMsg}</p>}
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowChangePinModal(false);
-                    setPinError("");
-                  }}
-                  className="w-1/2 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
-                >
-                  Save PIN
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Student Diagnostic Detail Modal & Printable Report Card */}
       {selectedStudentModal && (
