@@ -98,13 +98,6 @@ export default function HomePage() {
               <span>Explore All 7 Subjects & Topics</span>
               <ArrowRight className="w-4 h-4" />
             </a>
-
-            <Link
-              href="/admin"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 font-semibold transition-all"
-            >
-              <span>Teacher / Admin Dashboard</span>
-            </Link>
           </div>
         </div>
 
