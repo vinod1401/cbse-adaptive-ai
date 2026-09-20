@@ -31,6 +31,41 @@ import {
 import { syncStudentPerformance } from "@/lib/firebase";
 import { getAllTopics, getSubjects, getTopicsBySubject } from "@/lib/topics-metadata";
 
+function getLevelBadgeInfo(difficulty?: number, levelInfo?: any) {
+  if (levelInfo?.badge) return levelInfo;
+  const d = difficulty ?? -2.0;
+  if (d < -1.1) {
+    return {
+      level: 1,
+      label: "Foundation",
+      badge: "Level 1: Basic (सरल)",
+      color: "emerald",
+    };
+  }
+  if (d < 0.2) {
+    return {
+      level: 2,
+      label: "Intermediate",
+      badge: "Level 2: Moderate (मध्यम)",
+      color: "amber",
+    };
+  }
+  if (d < 1.5) {
+    return {
+      level: 3,
+      label: "Advanced",
+      badge: "Level 3: Advanced (कठिन)",
+      color: "indigo",
+    };
+  }
+  return {
+    level: 4,
+    label: "Olympiad",
+    badge: "Level 4: Olympiad (चुनौतीपूर्ण)",
+    color: "purple",
+  };
+}
+
 function PracticeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -345,6 +380,36 @@ function PracticeContent() {
     }
   };
 
+  const handleStartInfinitePractice = async () => {
+    setLoading(true);
+    const std = studentProfile || getSavedStudentProfile();
+    try {
+      const res = await fetch("/api/adaptive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "start",
+          topicId,
+          currentProfile: profile,
+          seenIds: [],
+          student: std ? { studentId: std.id, rollNo: std.rollNo, section: std.section } : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.item) {
+        setCurrentItem(data.item);
+        setFeedback(null);
+        setSelectedOption(null);
+        setSeenIds([data.item.id]);
+        setStartTime(Date.now());
+      }
+    } catch (e) {
+      console.error("Infinite start failed:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -364,10 +429,17 @@ function PracticeContent() {
         <p className="text-slate-400 text-sm leading-relaxed">
           Great job! You have answered the calibrated questions for this concept. Your ability and performance have been recorded for your teacher.
         </p>
-        <div className="flex flex-col gap-2 pt-2">
+        <div className="flex flex-col gap-2.5 pt-2">
+          <button
+            onClick={handleStartInfinitePractice}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-yellow-300" />
+            <span>अनलिमिटेड अभ्यास जारी रखें (Practice More)</span>
+          </button>
           <button
             onClick={() => setShowTopicModal(true)}
-            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all"
+            className="w-full py-3 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 font-semibold text-sm transition-all"
           >
             Practice Another Topic
           </button>
@@ -450,9 +522,15 @@ function PracticeContent() {
                 {profile?.theta >= 0 ? `+${profile?.theta.toFixed(2)}` : profile?.theta.toFixed(2)}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Current Status: <span className="font-semibold text-indigo-300">{tier.badge}</span>
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-slate-400">
+                Current Status: <span className="font-semibold text-indigo-300">{tier.badge}</span>
+              </span>
+              <span className="text-slate-600 text-xs">·</span>
+              <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
+                {currentItem ? getLevelBadgeInfo(currentItem.difficulty, currentItem.levelInfo).badge : "Level 1"}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -473,13 +551,34 @@ function PracticeContent() {
 
       {/* Main Question Card */}
       <div className="relative rounded-3xl bg-slate-900/70 border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between border-b border-slate-800/80 pb-4 gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               Problem #{seenIds.length}
             </span>
+
+            {/* Prominent Level-Wise Badge */}
+            {(() => {
+              const lvl = getLevelBadgeInfo(currentItem.difficulty, currentItem.levelInfo);
+              const badgeColors =
+                lvl.level === 1
+                  ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                  : lvl.level === 2
+                  ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                  : lvl.level === 3
+                  ? "bg-indigo-500/15 text-indigo-400 border-indigo-500/30"
+                  : "bg-purple-500/15 text-purple-400 border-purple-500/30";
+
+              return (
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badgeColors} shadow-sm`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                  {lvl.badge}
+                </span>
+              );
+            })()}
+
             <span className="text-xs text-slate-400">
-              Calibrated Difficulty (\(b\)): <span className="font-mono text-slate-200">{currentItem.difficulty >= 0 ? `+${currentItem.difficulty}` : currentItem.difficulty}</span>
+              Difficulty: <span className="font-mono text-slate-200">{currentItem.difficulty >= 0 ? `+${currentItem.difficulty}` : currentItem.difficulty}</span>
             </span>
           </div>
 

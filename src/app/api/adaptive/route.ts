@@ -18,6 +18,7 @@ import {
   selectNextOptimalItem,
   thetaToMasteryPercentage,
   getMasteryTier,
+  getItemLevel,
 } from "@/lib/irt-engine";
 import { generateDynamicAdaptiveQuestion } from "@/lib/gemini";
 import { getTopicById, CONCEPT_BANK } from "@/lib/question-bank";
@@ -103,7 +104,7 @@ export async function POST(request: Request) {
       if (student?.rollNo) profile.rollNo = student.rollNo;
       if (student?.section) profile.section = student.section;
 
-      const initialItem = selectNextOptimalItem(profile.theta, topic.items, seenSet);
+      const initialItem = selectNextOptimalItem(profile.theta, topic.items, seenSet, profile.itemsAttempted);
 
       if (!initialItem) {
         return NextResponse.json({ error: "No questions available" }, { status: 404 });
@@ -138,6 +139,7 @@ export async function POST(request: Request) {
         text: initialItem.text,
         options: shuffleOptions(initialItem.options),
         microTheory: initialItem.microTheory || topic.microTheory,
+        levelInfo: getItemLevel(initialItem.difficulty),
       };
 
       return NextResponse.json({
@@ -220,7 +222,7 @@ export async function POST(request: Request) {
       );
 
       seenSet.add(currentItem.id);
-      let nextItem = selectNextOptimalItem(updatedProfile.theta, topic.items, seenSet);
+      let nextItem = selectNextOptimalItem(updatedProfile.theta, topic.items, seenSet, updatedProfile.itemsAttempted);
 
       // Infinite AI Practice Fallback: If pre-calibrated bank exhausted, generate on-the-fly
       if (!nextItem) {
@@ -240,6 +242,18 @@ export async function POST(request: Request) {
         } catch (e) {
           console.warn("Dynamic item fallback notice:", e);
         }
+      }
+
+      // Continuous practice fallback: Loop matching level items with reshuffled choices so practice never halts
+      if (!nextItem && topic.items.length > 0) {
+        const currentLvl = getItemLevel(updatedProfile.theta).level;
+        const matchingLevelItems = topic.items.filter((it) => getItemLevel(it.difficulty).level === currentLvl);
+        const candidates = matchingLevelItems.length > 0 ? matchingLevelItems : topic.items;
+        const picked = candidates[Math.floor(Math.random() * candidates.length)];
+        nextItem = {
+          ...picked,
+          id: `${picked.id}_inf_${Date.now()}`,
+        };
       }
 
       // CRITICAL REPLAY DEFENSE: Consume item immediately in authoritative server store
@@ -264,6 +278,7 @@ export async function POST(request: Request) {
             text: nextItem.text,
             options: shuffleOptions(nextItem.options),
             microTheory: nextItem.microTheory || topic.microTheory,
+            levelInfo: getItemLevel(nextItem.difficulty),
           }
         : null;
 

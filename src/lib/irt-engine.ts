@@ -39,7 +39,7 @@ export interface StudentIRTProfile {
   }>;
 }
 
-export const INITIAL_THETA = 0.0;
+export const INITIAL_THETA = -2.0; // Level 1 (Foundation / Simple) starting point
 export const INITIAL_SE = 1.0;
 export const DEFAULT_GUESSING_C = 0.20; // 3PL lower asymptote for 4-option MCQs
 
@@ -150,27 +150,91 @@ export function updateStudentAbility(
   };
 }
 
+export interface ItemLevelInfo {
+  level: 1 | 2 | 3 | 4;
+  label: string;
+  badge: string;
+  color: "emerald" | "amber" | "indigo" | "purple";
+  description: string;
+}
+
+/**
+ * Maps psychometric difficulty parameter b to a student-friendly Level (1 to 4).
+ * Level 1: Foundation (सरल) -> b < -1.1
+ * Level 2: Intermediate (मध्यम) -> -1.1 <= b < 0.2
+ * Level 3: Advanced (कठिन) -> 0.2 <= b < 1.5
+ * Level 4: Olympiad (चुनौतीपूर्ण) -> b >= 1.5
+ */
+export function getItemLevel(difficulty: number): ItemLevelInfo {
+  if (difficulty < -1.1) {
+    return {
+      level: 1,
+      label: "Foundation",
+      badge: "Level 1: Basic (सरल)",
+      color: "emerald",
+      description: "Fundamental definitions & core properties",
+    };
+  }
+  if (difficulty < 0.2) {
+    return {
+      level: 2,
+      label: "Intermediate",
+      badge: "Level 2: Moderate (मध्यम)",
+      color: "amber",
+      description: "Standard calculations & core applications",
+    };
+  }
+  if (difficulty < 1.5) {
+    return {
+      level: 3,
+      label: "Advanced",
+      badge: "Level 3: Advanced (कठिन)",
+      color: "indigo",
+      description: "Multi-step methods & applied word problems",
+    };
+  }
+  return {
+    level: 4,
+    label: "Olympiad",
+    badge: "Level 4: Olympiad (चुनौतीपूर्ण)",
+    color: "purple",
+    description: "Deep conceptual reasoning & competition challenges",
+  };
+}
+
 /**
  * Computerized Adaptive Testing (CAT) Item Selector:
  * Selects the optimal next question maximizing Fisher Information (closest to student ability),
  * keeping the student in their Zone of Proximal Development (ZPD).
+ *
+ * For fresh sessions (itemsAttempted === 0), it strictly starts with Level 1 (easy / simple)
+ * to build confidence before escalating difficulty.
  */
 export function selectNextOptimalItem(
   theta: number,
   candidateItems: IRTItem[],
-  seenItemIds: Set<string>
+  seenItemIds: Set<string>,
+  itemsAttempted: number = 0
 ): IRTItem | null {
   const unseen = candidateItems.filter((it) => !seenItemIds.has(it.id));
   if (unseen.length === 0) return null;
-  const pool = unseen;
+
+  // Level 1 Scaffold: For the very first question, always start simple (b <= -1.1)
+  if (itemsAttempted === 0) {
+    const level1Items = unseen.filter((it) => it.difficulty <= -1.1);
+    if (level1Items.length > 0) {
+      const sorted = [...level1Items].sort((a, b) => a.difficulty - b.difficulty);
+      return sorted[0]; // Start with the easiest foundational item
+    }
+  }
 
   // Rank candidate questions by proximity to student ability |b - theta|
-  // with a small probabilistic temperature (0.15) to prevent identical sequence repetition
-  const ranked = pool
+  // with a small probabilistic temperature (0.05) to prevent identical sequence repetition
+  const ranked = unseen
     .map((item) => {
       const dist = Math.abs(item.difficulty - theta);
       const info = calculateItemInformation(theta, item.difficulty, item.discrimination || 1.0);
-      const score = info - (Math.random() * 0.05); // slight stochastic tie-breaker
+      const score = info - Math.random() * 0.05; // slight stochastic tie-breaker
       return { item, dist, score };
     })
     .sort((a, b) => b.score - a.score);

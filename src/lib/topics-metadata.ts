@@ -85,7 +85,7 @@ export const TOPICS_METADATA: ConceptTopic[] = [
     "icon": "Square",
     "color": "sky",
     "microTheory": "A square number is $n^2 = n \\times n$. It always has an odd number of factors and unit digit in $\\{0, 1, 4, 5, 6, 9\\}$. Between $n^2$ and $(n+1)^2$, there are $2n$ non-square numbers. Sum of first $n$ odd numbers is $n^2$. Square roots are found via prime factorisation, repeated subtraction, or the long division algorithm.",
-    "itemCount": 17
+    "itemCount": 32
   },
   {
     "id": "algebraic-identities",

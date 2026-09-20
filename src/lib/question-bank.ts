@@ -2,7 +2,7 @@
 // CBSE CLASS 8 COMPREHENSIVE ADAPTIVE QUESTION BANK
 // Subjects (7 Core): Mathematics, Science, English, Social Science, Hindi, Sanskrit, Computer Science
 // Psychometric IRT Calibrated Difficulty parameters (b: -2.5 to +2.5)
-// Total Questions: 374 Calibrated Items across 22 Curriculum Topics
+// Total Questions: 389 Calibrated Items across 22 Curriculum Topics
 // ============================================================================
 
 import { IRTItem } from "./irt-engine";
@@ -1245,6 +1245,264 @@ export const CONCEPT_BANK: ConceptTopic[] = [
         "explanation": "First, $\\sqrt{2025} = 45$ (since $45^2 = 2025$). Substituting: $45 + \\sqrt{0.0612 + x} = 45.25 \\implies \\sqrt{0.0612 + x} = 0.25$. Squaring both sides gives $0.0612 + x = (0.25)^2 = 0.0625$. Solving for x: $x = 0.0625 - 0.0612 = 0.0013$.",
         "misconceptions": {
           "$0.013$": "Watch decimal places: $(0.25)^2 = 0.0625$, and $0.0625 - 0.0612 = 0.0013$ (four decimal places, not three)."
+        }
+      },
+      {
+        "id": "sqr-18",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -2.2,
+        "text": "The square of an even natural number is always:",
+        "options": [
+          "An even number",
+          "An odd number",
+          "Can be even or odd",
+          "None of these"
+        ],
+        "correctAnswer": "An even number",
+        "explanation": "Any even natural number can be written as 2k. Its square is $(2k)^2 = 4k^2 = 2(2k^2)$, which is divisible by 2 and therefore always an even number. For example: $4^2 = 16$, $6^2 = 36$.",
+        "misconceptions": {
+          "Can be even or odd": "The square of an even number is always strictly even. Only odd numbers produce odd squares (e.g., $3^2 = 9$)."
+        }
+      },
+      {
+        "id": "sqr-19",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -1.9,
+        "text": "Find the smallest 4-digit number which is a perfect square.",
+        "options": [
+          "$1024$",
+          "$1000$",
+          "$1089$",
+          "$1156$"
+        ],
+        "correctAnswer": "$1024$",
+        "explanation": "The smallest 4-digit number is 1000. Testing squares near 1000: $31^2 = 961$ (3 digits) and $32^2 = 1024$ (4 digits). Hence, 1024 is the smallest 4-digit perfect square.",
+        "misconceptions": {
+          "$1000$": "1000 ends in 3 zeros (an odd number of zeros) and is not a perfect square ($1000 = 10^3$, a cube)."
+        }
+      },
+      {
+        "id": "sqr-20",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -1.6,
+        "text": "What is the value of $\\sqrt{0.0016}$?",
+        "options": [
+          "$0.04$",
+          "$0.004$",
+          "$0.4$",
+          "$0.0004$"
+        ],
+        "correctAnswer": "$0.04$",
+        "explanation": "$\\sqrt{0.0016} = \\sqrt{\\frac{16}{10000}} = \\frac{\\sqrt{16}}{\\sqrt{10000}} = \\frac{4}{100} = 0.04$. (Checking: $0.04 \\times 0.04 = 0.0016$).",
+        "misconceptions": {
+          "$0.004$": "Squaring 0.004 gives 0.000016 (6 decimal places), not 0.0016.",
+          "$0.4$": "Squaring 0.4 gives 0.16 (2 decimal places)."
+        }
+      },
+      {
+        "id": "sqr-21",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -1.3,
+        "text": "How many natural numbers lie between $99^2$ and $100^2$?",
+        "options": [
+          "$198$",
+          "$199$",
+          "$200$",
+          "$99$"
+        ],
+        "correctAnswer": "$198$",
+        "explanation": "Between $n^2$ and $(n+1)^2$, there are $2n$ non-square natural numbers. For $n = 99$, the number of natural numbers is $2 \\times 99 = 198$.",
+        "misconceptions": {
+          "$199$": "$100^2 - 99^2 = 10000 - 9801 = 199$. But this includes one boundary; the count of numbers strictly between them is $199 - 1 = 198$."
+        }
+      },
+      {
+        "id": "sqr-22",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -0.9,
+        "text": "In a competition, you earn 1 point for round 1, 3 points for round 2, 5 points for round 3, and so on (successive odd points). Find the total points scored by Raj who completed 5 rounds.",
+        "options": [
+          "$25$",
+          "$15$",
+          "$36$",
+          "$20$"
+        ],
+        "correctAnswer": "$25$",
+        "explanation": "Raj's score is the sum of the first 5 odd natural numbers: $1 + 3 + 5 + 7 + 9$. By the property of odd squares, the sum of first n odd numbers is $n^2 = 5^2 = 25$ points.",
+        "misconceptions": {
+          "$15$": "15 is the sum of first 5 natural numbers (1+2+3+4+5), but here the points are consecutive odd numbers."
+        }
+      },
+      {
+        "id": "sqr-23",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -0.6,
+        "text": "In the same competition with points awarded as consecutive odd numbers ($1, 3, 5, \\dots$), Shivanya scored a total of $81$ points. How many rounds did she clear?",
+        "options": [
+          "$9$",
+          "$8$",
+          "$7$",
+          "$10$"
+        ],
+        "correctAnswer": "$9$",
+        "explanation": "Since the sum of the first n odd numbers is $n^2$, we set $n^2 = 81$. Taking the square root gives $n = \\sqrt{81} = 9$. Thus, Shivanya cleared 9 rounds.",
+        "misconceptions": {
+          "$8$": "$8^2 = 64 < 81$. She needed 9 rounds ($9^2 = 81$)."
+        }
+      },
+      {
+        "id": "sqr-24",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -0.2,
+        "text": "Find the smallest natural number by which $3675$ should be multiplied so that the product becomes a perfect square.",
+        "options": [
+          "$3$",
+          "$5$",
+          "$7$",
+          "$2$"
+        ],
+        "correctAnswer": "$3$",
+        "explanation": "Prime factorising 3675: $3675 = 3 \\times 1225 = 3 \\times 5^2 \\times 7^2 = 3 \\times (5 \\times 7)^2 = 3 \\times 35^2$. The prime factor 3 is single (unpaired). Multiplying by 3 gives $11025 = 105^2$.",
+        "misconceptions": {
+          "$7$": "$7^2$ is already paired. Only 3 lacks a pair."
+        }
+      },
+      {
+        "id": "sqr-25",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 0.1,
+        "text": "Find the smallest square number which is divisible by each of the numbers $6$, $8$, and $9$.",
+        "options": [
+          "$144$",
+          "$72$",
+          "$36$",
+          "$576$"
+        ],
+        "correctAnswer": "$144$",
+        "explanation": "First find $\\text{LCM}(6, 8, 9) = 72$. Prime factorisation: $72 = 2^3 \\times 3^2 = 2^2 \\times 3^2 \\times 2$. The prime factor 2 is unpaired. Multiplying 72 by 2 gives $144 = 12^2$, which is the smallest square divisible by 6, 8, and 9.",
+        "misconceptions": {
+          "$72$": "72 is the LCM, but not a perfect square since $2^3$ has an odd exponent.",
+          "$576$": "576 is divisible by 6, 8, and 9, but 144 is smaller."
+        }
+      },
+      {
+        "id": "sqr-26",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 0.5,
+        "text": "In an auditorium, the number of rows is equal to the number of chairs in each row. If the capacity of the auditorium is $1764$, find the number of chairs in each row.",
+        "options": [
+          "$42$",
+          "$38$",
+          "$44$",
+          "$46$"
+        ],
+        "correctAnswer": "$42$",
+        "explanation": "Let the number of rows be x. Chairs per row = x. Total chairs $= x^2 = 1764$. Taking the square root by prime factorisation: $1764 = 2^2 \\times 3^2 \\times 7^2 \\implies x = 2 \\times 3 \\times 7 = 42$ chairs.",
+        "misconceptions": {
+          "$44$": "$44^2 = 1936 > 1764$. $42^2 = 1764$."
+        }
+      },
+      {
+        "id": "sqr-27",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 0.9,
+        "text": "Find the length of the diagonal of a rectangle whose length and breadth are $12\\text{ m}$ and $5\\text{ m}$ respectively.",
+        "options": [
+          "$13\\text{ m}$",
+          "$17\\text{ m}$",
+          "$15\\text{ m}$",
+          "$14\\text{ m}$"
+        ],
+        "correctAnswer": "$13\\text{ m}$",
+        "explanation": "By Pythagoras theorem, $(\\text{diagonal})^2 = l^2 + b^2 = 12^2 + 5^2 = 144 + 25 = 169$. Thus diagonal $= \\sqrt{169} = 13\\text{ m}$.",
+        "misconceptions": {
+          "$17\\text{ m}$": "Adding length and breadth (12 + 5 = 17) gives the semi-perimeter, not the diagonal."
+        }
+      },
+      {
+        "id": "sqr-28",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1.2,
+        "text": "In a right triangle $ABC$ with $\\angle B = 90^\\circ$, if $AC = 37\\text{ cm}$ and $BC = 35\\text{ cm}$, find the length of $AB$.",
+        "options": [
+          "$12\\text{ cm}$",
+          "$14\\text{ cm}$",
+          "$16\\text{ cm}$",
+          "$10\\text{ cm}$"
+        ],
+        "correctAnswer": "$12\\text{ cm}$",
+        "explanation": "In right $\\triangle ABC$, $AC^2 = AB^2 + BC^2 \\implies AB^2 = AC^2 - BC^2 = 37^2 - 35^2$. Using $a^2 - b^2 = (a-b)(a+b): AB^2 = (37-35)(37+35) = 2 \\times 72 = 144$. Thus $AB = \\sqrt{144} = 12\\text{ cm}$.",
+        "misconceptions": {
+          "$14\\text{ cm}$": "$37 - 35 = 2$, not taking square root of $(37^2 - 35^2)$."
+        }
+      },
+      {
+        "id": "sqr-29",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1.4,
+        "text": "Amit walks $16\\text{ m}$ south from his house and turns east to walk $63\\text{ m}$ to reach his friend's house. While returning, he walks diagonally straight back home. What distance did he walk while returning?",
+        "options": [
+          "$65\\text{ m}$",
+          "$79\\text{ m}$",
+          "$67\\text{ m}$",
+          "$71\\text{ m}$"
+        ],
+        "correctAnswer": "$65\\text{ m}$",
+        "explanation": "South and East form a right angle (90°). Returning diagonally forms the hypotenuse: $d^2 = 16^2 + 63^2 = 256 + 3969 = 4225$. Thus $d = \\sqrt{4225} = 65\\text{ m}$.",
+        "misconceptions": {
+          "$79\\text{ m}$": "$16 + 63 = 79\\text{ m}$ is the distance along the roads, not the straight diagonal return path."
+        }
+      },
+      {
+        "id": "sqr-30",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1.9,
+        "text": "Find the least number which must be subtracted from $2311$ to make it a perfect square.",
+        "options": [
+          "$7$",
+          "$11$",
+          "$15$",
+          "$23$"
+        ],
+        "correctAnswer": "$7$",
+        "explanation": "Using long division to find the largest square $\\le 2311$: $4^2 = 16$, remainder 7, bring down 11 => 711. Trial divisor $88 \\times 8 = 704$. Remainder is $711 - 704 = 7$. Thus $2311 - 7 = 2304 = 48^2$. The least number to subtract is 7.",
+        "misconceptions": {
+          "$11$": "Be careful with subtraction in long division: $711 - 704 = 7$, not 11."
+        }
+      },
+      {
+        "id": "sqr-31",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 2.2,
+        "text": "A square field is to be ploughed. Ramu gets it ploughed at ₹$15$ per square metre for a total cost of ₹$34560$. Find the length of each side of the square field.",
+        "options": [
+          "$48\\text{ m}$",
+          "$42\\text{ m}$",
+          "$54\\text{ m}$",
+          "$52\\text{ m}$"
+        ],
+        "correctAnswer": "$48\\text{ m}$",
+        "explanation": "Area of field $= \\frac{\\text{Total Cost}}{\\text{Rate per sq m}} = \\frac{34560}{15} = 2304\\text{ m}^2$. For a square of side s, $s^2 = 2304$. Taking square root: $s = \\sqrt{2304} = 48\\text{ m}$.",
+        "misconceptions": {
+          "$42\\text{ m}$": "$42^2 = 1764 \\neq 2304$."
+        }
+      },
+      {
+        "id": "sqr-32",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 2.4,
+        "text": "Find the greatest 5-digit number which is a perfect square.",
+        "options": [
+          "$99856$",
+          "$99999$",
+          "$98596$",
+          "$99225$"
+        ],
+        "correctAnswer": "$99856$",
+        "explanation": "The greatest 5-digit number is 99999. Applying the long division method: $316^2 = 99856$ with a remainder of $99999 - 99856 = 143$. Subtracting the remainder from 99999 gives 99856, which is $316^2$, the greatest 5-digit perfect square.",
+        "misconceptions": {
+          "$99999$": "99999 is the largest 5-digit number, but it is not a perfect square.",
+          "$99225$": "$99225 = 315^2$, but $316^2 = 99856$ is larger and still 5 digits."
         }
       }
     ]
