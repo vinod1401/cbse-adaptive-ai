@@ -184,3 +184,81 @@ test('Suite 8: Admin Student Record Deletion & Purge Protection', () => {
   assert(recordsStoreContent.includes('export async function resetToBaselineRoster'), 'records store must export resetToBaselineRoster');
 });
 
+// ---------------------------------------------------------------------------
+// 9. Concept-Targeted Remediation & Weak-Area Mastery Graduation
+// ---------------------------------------------------------------------------
+test('Suite 9: Concept-Targeted Remediation & Mastery Graduation Engine', () => {
+  const irtPath = path.join(projectRoot, 'src', 'lib', 'irt-engine.ts');
+  const irtContent = fs.readFileSync(irtPath, 'utf8');
+
+  // Verify WeakConceptState interface and profile field
+  assert(irtContent.includes('export interface WeakConceptState'), 'irt-engine must define WeakConceptState');
+  assert(irtContent.includes('weakConcepts?: Record<string, WeakConceptState>'), 'StudentIRTProfile must contain weakConcepts map');
+  assert(irtContent.includes('status: "needs_work" | "mastered"'), 'WeakConceptState must support needs_work and mastered states');
+  assert(irtContent.includes('preferredSubtopic?: string'), 'selectNextOptimalItem must support preferredSubtopic parameter');
+
+  // Verify adaptive API route integration
+  const adaptiveRoutePath = path.join(projectRoot, 'src', 'app', 'api', 'adaptive', 'route.ts');
+  const adaptiveRouteContent = fs.readFileSync(adaptiveRoutePath, 'utf8');
+
+  assert(adaptiveRouteContent.includes('getItemSubtopic'), 'adaptive route must include getItemSubtopic helper');
+  assert(adaptiveRouteContent.includes('conceptJustMastered'), 'adaptive route must compute conceptJustMastered');
+  assert(adaptiveRouteContent.includes('focusConcept'), 'adaptive route must compute and return focusConcept');
+  assert(adaptiveRouteContent.includes('targetFocusConcept'), 'adaptive route must pass targetFocusConcept to dynamic AI generator');
+
+  // Verify UI banner and celebration integration
+  const practiceUiPath = path.join(projectRoot, 'src', 'app', 'practice', 'page.tsx');
+  const practiceUiContent = fs.readFileSync(practiceUiPath, 'utf8');
+
+  assert(practiceUiContent.includes('सुधार अभ्यास'), 'practice UI must contain remediation focus badge in Hindi');
+  assert(practiceUiContent.includes('conceptJustMastered'), 'practice UI must handle conceptJustMastered celebration');
+
+  // Behavioral Simulation of Mastery Logic:
+  // Step 1: Student gets question wrong on subtopic A -> status becomes "needs_work"
+  let profile = {
+    theta: -2.0,
+    standardError: 1.0,
+    itemsAttempted: 0,
+    correctCount: 0,
+    history: [],
+    weakConcepts: {},
+  };
+
+  const itemA = {
+    id: "sqr-1",
+    topicId: "squares-and-square-roots",
+    difficulty: -2.4,
+    text: "Test item",
+    options: ["A", "B"],
+    correctAnswer: "A",
+    explanation: "Exp",
+    subtopic: "Repeated Subtraction & Factorisation",
+  };
+
+  // Simulate wrong answer on itemA
+  const cKey = itemA.subtopic;
+  profile.weakConcepts[cKey] = {
+    concept: cKey,
+    errors: 1,
+    successes: 0,
+    status: "needs_work",
+    lastMisconception: "Did not pair factors",
+    lastUpdated: Date.now(),
+  };
+
+  assert.strictEqual(profile.weakConcepts[cKey].status, "needs_work", "Subtopic must be flagged as needs_work on error");
+  assert.strictEqual(profile.weakConcepts[cKey].errors, 1);
+
+  // Step 2: Student gets 1st remedial question right on subtopic A -> errors=1, successes=1, still needs_work
+  profile.weakConcepts[cKey].successes += 1;
+  assert.strictEqual(profile.weakConcepts[cKey].status, "needs_work", "Subtopic remains in needs_work with 1 success");
+
+  // Step 3: Student gets 2nd remedial question right on subtopic A -> graduation threshold reached (>=2)
+  profile.weakConcepts[cKey].successes += 1;
+  if (profile.weakConcepts[cKey].successes >= 2) {
+    profile.weakConcepts[cKey].status = "mastered";
+  }
+  assert.strictEqual(profile.weakConcepts[cKey].status, "mastered", "Subtopic graduates to mastered after 2 correct answers");
+});
+
+

@@ -19,7 +19,17 @@ export interface IRTItem {
   correctAnswer: string;
   explanation: string;
   microTheory?: string;
+  subtopic?: string;
   misconceptions?: Record<string, string>; // maps wrong option to specific conceptual error
+}
+
+export interface WeakConceptState {
+  concept: string;
+  errors: number;
+  successes: number;
+  status: "needs_work" | "mastered";
+  lastMisconception?: string;
+  lastUpdated: number;
 }
 
 export interface StudentIRTProfile {
@@ -36,7 +46,9 @@ export interface StudentIRTProfile {
     correct: boolean;
     thetaAfter: number;
     timeTakenSeconds?: number;
+    subtopic?: string;
   }>;
+  weakConcepts?: Record<string, WeakConceptState>;
 }
 
 export const INITIAL_THETA = -2.0; // Level 1 (Foundation / Simple) starting point
@@ -101,7 +113,8 @@ export function updateStudentAbility(
   currentProfile: StudentIRTProfile,
   item: IRTItem,
   isCorrect: boolean,
-  timeTakenSeconds?: number
+  timeTakenSeconds?: number,
+  misconceptionLabel?: string
 ): StudentIRTProfile {
   const a = item.discrimination || 1.0;
   const b = item.difficulty;
@@ -135,8 +148,44 @@ export function updateStudentAbility(
       correct: isCorrect,
       thetaAfter: Number(newTheta.toFixed(3)),
       timeTakenSeconds,
+      subtopic: item.subtopic,
     },
   ];
+
+  // Concept-Targeted Remediation Tracking:
+  const updatedWeakConcepts: Record<string, WeakConceptState> = {
+    ...(currentProfile.weakConcepts || {}),
+  };
+
+  const conceptKey = item.subtopic || "General Concepts";
+
+  if (!isCorrect) {
+    const existing = updatedWeakConcepts[conceptKey] || {
+      concept: conceptKey,
+      errors: 0,
+      successes: 0,
+      status: "needs_work" as const,
+      lastUpdated: Date.now(),
+    };
+    existing.errors += 1;
+    existing.status = "needs_work";
+    if (misconceptionLabel) {
+      existing.lastMisconception = misconceptionLabel;
+    }
+    existing.lastUpdated = Date.now();
+    updatedWeakConcepts[conceptKey] = existing;
+  } else {
+    if (updatedWeakConcepts[conceptKey]) {
+      const existing = updatedWeakConcepts[conceptKey];
+      existing.successes += 1;
+      // Graduation: 2 consecutive/repeated successes on the weak concept marks it mastered
+      if (existing.successes >= 2) {
+        existing.status = "mastered";
+      }
+      existing.lastUpdated = Date.now();
+      updatedWeakConcepts[conceptKey] = existing;
+    }
+  }
 
   return {
     studentId: currentProfile.studentId,
@@ -147,6 +196,7 @@ export function updateStudentAbility(
     itemsAttempted,
     correctCount,
     history,
+    weakConcepts: updatedWeakConcepts,
   };
 }
 
@@ -214,7 +264,8 @@ export function selectNextOptimalItem(
   theta: number,
   candidateItems: IRTItem[],
   seenItemIds: Set<string>,
-  itemsAttempted: number = 0
+  itemsAttempted: number = 0,
+  preferredSubtopic?: string
 ): IRTItem | null {
   const unseen = candidateItems.filter((it) => !seenItemIds.has(it.id));
   if (unseen.length === 0) return null;
@@ -228,9 +279,20 @@ export function selectNextOptimalItem(
     }
   }
 
+  // Targeted Remediation: If a weak subtopic is specified, prioritize questions from that subtopic
+  let targetPool = unseen;
+  if (preferredSubtopic) {
+    const subtopicItems = unseen.filter(
+      (it) => it.subtopic?.toLowerCase() === preferredSubtopic.toLowerCase()
+    );
+    if (subtopicItems.length > 0) {
+      targetPool = subtopicItems;
+    }
+  }
+
   // Rank candidate questions by proximity to student ability |b - theta|
   // with a small probabilistic temperature (0.05) to prevent identical sequence repetition
-  const ranked = unseen
+  const ranked = targetPool
     .map((item) => {
       const dist = Math.abs(item.difficulty - theta);
       const info = calculateItemInformation(theta, item.difficulty, item.discrimination || 1.0);

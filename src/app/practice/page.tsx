@@ -531,6 +531,23 @@ function PracticeContent() {
                 {currentItem ? getLevelBadgeInfo(currentItem.difficulty, currentItem.levelInfo).badge : "Level 1"}
               </span>
             </div>
+            {/* Active / Mastered Subtopics pills */}
+            {profile?.weakConcepts && Object.keys(profile.weakConcepts).length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                {Object.values(profile.weakConcepts).map((wc: any) => (
+                  <span
+                    key={wc.concept}
+                    className={`text-[10px] px-2 py-0.5 rounded-md font-medium border ${
+                      wc.status === "mastered"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        : "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                    }`}
+                  >
+                    {wc.status === "mastered" ? "✓" : "🎯"} {wc.concept}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -576,6 +593,18 @@ function PracticeContent() {
                 </span>
               );
             })()}
+
+            {/* Targeted Remedial Focus Banner */}
+            {currentItem.focusConcept ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30 shadow-sm animate-pulse">
+                <span>🎯</span>
+                <span>Focus: {currentItem.focusConcept} (सुधार अभ्यास)</span>
+              </span>
+            ) : currentItem.subtopic ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                <span>📖 {currentItem.subtopic}</span>
+              </span>
+            ) : null}
 
             <span className="text-xs text-slate-400">
               Difficulty: <span className="font-mono text-slate-200">{currentItem.difficulty >= 0 ? `+${currentItem.difficulty}` : currentItem.difficulty}</span>
@@ -672,6 +701,21 @@ function PracticeContent() {
           </div>
         ) : (
           <div className="pt-4 space-y-4">
+            {/* Celebration for Concept Mastery */}
+            {feedback.conceptJustMastered && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-indigo-500/20 border border-amber-500/40 text-amber-200 flex items-center gap-3">
+                <span className="text-2xl animate-bounce">🎉</span>
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-sm text-white">
+                    शाबाश! आपने &ldquo;{feedback.conceptJustMastered}&rdquo; कॉन्सेप्ट मास्टर कर लिया!
+                  </h4>
+                  <p className="text-xs text-amber-200/90">
+                    इस कॉन्सेप्ट के सवाल सही होने लगे हैं। अब AI आपको अगले महत्वपूर्ण कॉन्सेप्ट के सवाल पूछेगा।
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Feedback Box */}
             <div
               className={`p-4 rounded-2xl border flex items-start gap-3.5 ${
@@ -696,6 +740,14 @@ function PracticeContent() {
                   <div className="mt-2 p-2.5 rounded-xl bg-rose-900/30 border border-rose-800 text-xs space-y-1">
                     <span className="font-bold text-rose-300">Target Remediation:</span>
                     <p className="text-rose-200/90">{feedback.misconception.remedialHint}</p>
+                  </div>
+                )}
+                {!feedback.isCorrect && (
+                  <div className="mt-2 text-xs text-rose-300/90 bg-rose-950/30 p-2.5 rounded-xl border border-rose-900/50 flex items-center gap-2">
+                    <span className="text-base">🎯</span>
+                    <span>
+                      AI अब आपके इस कमजोर कॉन्सेप्ट (<strong>{feedback.focusConcept || currentItem.subtopic}</strong>) पर अतिरिक्त सवाल पूछेगा जब तक यह मजबूत न हो जाए।
+                    </span>
                   </div>
                 )}
               </div>

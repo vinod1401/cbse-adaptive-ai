@@ -73,6 +73,21 @@ function shuffleOptions<T>(array: T[]): T[] {
   return arr;
 }
 
+// Subtopic resolution helper
+function getItemSubtopic(item: any, topicSubtopics: string[]): string {
+  if (item?.subtopic) return item.subtopic;
+  if (!topicSubtopics || topicSubtopics.length === 0) return "Core Concepts";
+  const text = ((item?.text || "") + " " + (item?.explanation || "")).toLowerCase();
+  for (const st of topicSubtopics) {
+    const words = st.toLowerCase().split(/[ &/,]+/);
+    if (words.some((w) => w.length > 3 && text.includes(w))) {
+      return st;
+    }
+  }
+  const hash = Math.abs(String(item?.id || "").split("").reduce((acc, c) => acc + c.charCodeAt(0), 0));
+  return topicSubtopics[hash % topicSubtopics.length] || topicSubtopics[0];
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -104,7 +119,18 @@ export async function POST(request: Request) {
       if (student?.rollNo) profile.rollNo = student.rollNo;
       if (student?.section) profile.section = student.section;
 
-      const initialItem = selectNextOptimalItem(profile.theta, topic.items, seenSet, profile.itemsAttempted);
+      // Check if student has an existing weak concept to prioritize
+      const initialActiveWeak = Object.values(profile.weakConcepts || {}).find(
+        (c) => c.status === "needs_work"
+      );
+
+      const initialItem = selectNextOptimalItem(
+        profile.theta,
+        topic.items,
+        seenSet,
+        profile.itemsAttempted,
+        initialActiveWeak?.concept
+      );
 
       if (!initialItem) {
         return NextResponse.json({ error: "No questions available" }, { status: 404 });
@@ -131,6 +157,8 @@ export async function POST(request: Request) {
         maxAge: SESSION_MAX_AGE_SECONDS,
       });
 
+      const initialFocusConcept = initialActiveWeak ? initialActiveWeak.concept : null;
+
       // STRICT SECURITY: Strip correctAnswer from client payload
       const safeItem = {
         id: initialItem.id,
@@ -140,6 +168,8 @@ export async function POST(request: Request) {
         options: shuffleOptions(initialItem.options),
         microTheory: initialItem.microTheory || topic.microTheory,
         levelInfo: getItemLevel(initialItem.difficulty),
+        subtopic: initialItem.subtopic || getItemSubtopic(initialItem, topic.subtopics),
+        focusConcept: initialFocusConcept,
       };
 
       return NextResponse.json({
@@ -149,6 +179,7 @@ export async function POST(request: Request) {
         signature: signProfile(profile, student),
         masteryPct: thetaToMasteryPercentage(profile.theta),
         tier: getMasteryTier(profile.theta),
+        focusConcept: initialFocusConcept,
       });
     }
 
@@ -213,16 +244,47 @@ export async function POST(request: Request) {
       }
 
       const isCorrect = answer === currentItem.correctAnswer;
+      const itemSubtopic = getItemSubtopic(currentItem, topic.subtopics);
+      const itemWithSubtopic = { ...currentItem, subtopic: itemSubtopic };
+
+      let misconception: any = null;
+      if (!isCorrect && currentItem.misconceptions && answer) {
+        const rawM = currentItem.misconceptions[answer];
+        if (typeof rawM === "string") {
+          misconception = { label: rawM, remedialHint: rawM };
+        } else if (rawM) {
+          misconception = rawM;
+        }
+      }
+
+      const previousStatus = profile.weakConcepts?.[itemSubtopic]?.status;
 
       const updatedProfile = updateStudentAbility(
         profile,
-        currentItem,
+        itemWithSubtopic,
         isCorrect,
-        body.timeTakenSeconds
+        body.timeTakenSeconds,
+        misconception?.label
       );
 
+      const currentStatus = updatedProfile.weakConcepts?.[itemSubtopic]?.status;
+      const conceptJustMastered =
+        previousStatus === "needs_work" && currentStatus === "mastered" ? itemSubtopic : null;
+
+      // Identify active weak concept needing remediation
+      const activeWeakConcept = Object.values(updatedProfile.weakConcepts || {}).find(
+        (c) => c.status === "needs_work"
+      );
+      const focusConcept = activeWeakConcept ? activeWeakConcept.concept : null;
+
       seenSet.add(currentItem.id);
-      let nextItem = selectNextOptimalItem(updatedProfile.theta, topic.items, seenSet, updatedProfile.itemsAttempted);
+      let nextItem = selectNextOptimalItem(
+        updatedProfile.theta,
+        topic.items,
+        seenSet,
+        updatedProfile.itemsAttempted,
+        focusConcept || undefined
+      );
 
       // Infinite AI Practice Fallback: If pre-calibrated bank exhausted, generate on-the-fly
       if (!nextItem) {
@@ -234,6 +296,8 @@ export async function POST(request: Request) {
             chapter: topic.chapter,
             targetDifficulty: updatedProfile.theta,
             subtopics: topic.subtopics,
+            targetFocusConcept: focusConcept || undefined,
+            studentWeaknessContext: activeWeakConcept?.lastMisconception,
           });
           if (dynItem) {
             topic.items.push(dynItem);
@@ -247,12 +311,23 @@ export async function POST(request: Request) {
       // Continuous practice fallback: Loop matching level items with reshuffled choices so practice never halts
       if (!nextItem && topic.items.length > 0) {
         const currentLvl = getItemLevel(updatedProfile.theta).level;
-        const matchingLevelItems = topic.items.filter((it) => getItemLevel(it.difficulty).level === currentLvl);
-        const candidates = matchingLevelItems.length > 0 ? matchingLevelItems : topic.items;
+        let candidates = topic.items;
+        if (focusConcept) {
+          const subtopicItems = topic.items.filter(
+            (it) => (it.subtopic || getItemSubtopic(it, topic.subtopics)).toLowerCase() === focusConcept.toLowerCase()
+          );
+          if (subtopicItems.length > 0) {
+            candidates = subtopicItems;
+          }
+        } else {
+          const matchingLevelItems = topic.items.filter((it) => getItemLevel(it.difficulty).level === currentLvl);
+          if (matchingLevelItems.length > 0) candidates = matchingLevelItems;
+        }
         const picked = candidates[Math.floor(Math.random() * candidates.length)];
         nextItem = {
           ...picked,
           id: `${picked.id}_inf_${Date.now()}`,
+          subtopic: picked.subtopic || getItemSubtopic(picked, topic.subtopics),
         };
       }
 
@@ -279,24 +354,18 @@ export async function POST(request: Request) {
             options: shuffleOptions(nextItem.options),
             microTheory: nextItem.microTheory || topic.microTheory,
             levelInfo: getItemLevel(nextItem.difficulty),
+            subtopic: nextItem.subtopic || getItemSubtopic(nextItem, topic.subtopics),
+            focusConcept: focusConcept || null,
           }
         : null;
-
-      let misconception: any = null;
-      if (!isCorrect && currentItem.misconceptions && answer) {
-        const rawM = currentItem.misconceptions[answer];
-        if (typeof rawM === "string") {
-          misconception = { label: rawM, remedialHint: rawM };
-        } else if (rawM) {
-          misconception = rawM;
-        }
-      }
 
       return NextResponse.json({
         isCorrect,
         explanation: currentItem.explanation,
         correctAnswer: currentItem.correctAnswer,
         misconception,
+        conceptJustMastered,
+        focusConcept,
         profile: updatedProfile,
         signature: signProfile(updatedProfile, student),
         masteryPct: thetaToMasteryPercentage(updatedProfile.theta),

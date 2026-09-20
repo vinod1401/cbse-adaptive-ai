@@ -88,15 +88,21 @@ export interface DynamicQuestionParams {
   chapter: string;
   targetDifficulty: number; // theta around [-2.5, +2.5]
   subtopics: string[];
+  targetFocusConcept?: string; // Specific weak concept needing remediation
+  studentWeaknessContext?: string; // Recent misconception or mistake made by student
 }
 
 /**
  * Infinite Mode AI Question Generator (Zero-Cost Gemini Free Tier)
  * Dynamically synthesizes fresh CBSE Class 8 questions tailored to student theta
- * when the pre-calibrated bank has been fully exhausted in an extended session.
+ * and specifically focused on student weak concepts when remediation is required.
  */
 export async function generateDynamicAdaptiveQuestion(params: DynamicQuestionParams): Promise<any | null> {
   if (!client) return null;
+
+  const remedialFocusPrompt = params.targetFocusConcept
+    ? `\nCRITICAL TARGETED REMEDIATION INSTRUCTION:\nThe student has a demonstrated weakness in the subtopic: "${params.targetFocusConcept}".\n${params.studentWeaknessContext ? `Recent student misconception/error: "${params.studentWeaknessContext}".` : ""}\nYou MUST generate a question specifically testing and strengthening this exact subtopic to help the student achieve mastery.\n`
+    : "";
 
   const prompt = `
 Generate 1 unique, high-quality multiple choice question for CBSE Class 8 students.
@@ -105,7 +111,7 @@ Chapter: ${params.chapter}
 Topic: ${params.topicTitle}
 Subtopics: ${params.subtopics.join(", ")}
 Target Psychometric Difficulty (b-parameter on scale -2.5 to +2.5): ${params.targetDifficulty.toFixed(2)}
-
+${remedialFocusPrompt}
 Requirements:
 1. Provide exactly 4 options.
 2. Clearly identify the single correct answer (must match one of the 4 options verbatim).
@@ -140,6 +146,7 @@ Return ONLY valid raw JSON without markdown backticks.
         id: `dyn-${params.topicId}-${Date.now()}`,
         topicId: params.topicId,
         difficulty: params.targetDifficulty,
+        subtopic: params.targetFocusConcept || params.subtopics[0] || "General Concepts",
         text: parsed.text,
         options: parsed.options,
         correctAnswer: parsed.correctAnswer,
