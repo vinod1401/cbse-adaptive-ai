@@ -162,3 +162,25 @@ test('Suite 7: Strict TypeScript Enforcement', () => {
 
   assert(!nextConfigContent.includes('ignoreBuildErrors'), 'next.config.mjs must NOT contain ignoreBuildErrors');
 });
+
+// ---------------------------------------------------------------------------
+// 8. Admin Student Record Deletion & Purge Protection
+// ---------------------------------------------------------------------------
+test('Suite 8: Admin Student Record Deletion & Purge Protection', () => {
+  const recordsRoutePath = path.join(projectRoot, 'src', 'app', 'api', 'student', 'records', 'route.ts');
+  const recordsRouteContent = fs.readFileSync(recordsRoutePath, 'utf8');
+
+  assert(recordsRouteContent.includes('export async function DELETE'), 'records route must export DELETE method');
+  assert(recordsRouteContent.includes('verifyAdminToken'), 'records DELETE must verify admin token');
+  assert(recordsRouteContent.includes('deleteStudentRecord'), 'records DELETE must call deleteStudentRecord');
+  assert(recordsRouteContent.includes('clearAllStudentRecords'), 'records DELETE must support clearAllStudentRecords');
+  assert(recordsRouteContent.includes('resetToBaselineRoster'), 'records DELETE must support resetToBaselineRoster');
+
+  const recordsStorePath = path.join(projectRoot, 'src', 'lib', 'student-records-store.ts');
+  const recordsStoreContent = fs.readFileSync(recordsStorePath, 'utf8');
+
+  assert(recordsStoreContent.includes('export async function deleteStudentRecord'), 'records store must export deleteStudentRecord');
+  assert(recordsStoreContent.includes('export async function clearAllStudentRecords'), 'records store must export clearAllStudentRecords');
+  assert(recordsStoreContent.includes('export async function resetToBaselineRoster'), 'records store must export resetToBaselineRoster');
+});
+

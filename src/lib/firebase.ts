@@ -11,6 +11,8 @@ import {
   StudentPerformanceRecord,
   getCachedStudentRoster,
   cacheStudentRoster,
+  deleteCachedStudentRecord,
+  clearCachedStudentRoster,
 } from "./student-session";
 import { BASELINE_ROSTER } from "./student-records-store";
 
@@ -82,27 +84,99 @@ export async function syncStudentPerformance(payload: SyncStudentPayload): Promi
  * Fetch student records from the authenticated server records endpoint.
  */
 export async function fetchAllStudentRecords(): Promise<StudentPerformanceRecord[]> {
-  const localList = getCachedStudentRoster();
-
   try {
     const res = await fetch("/api/student/records");
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data.records) && data.records.length > 0) {
-        const map = new Map<string, StudentPerformanceRecord>();
-        BASELINE_ROSTER.forEach((item) => map.set(item.id, item));
-        data.records.forEach((item: StudentPerformanceRecord) => map.set(item.id, item));
-        localList.forEach((item) => map.set(item.id, item));
-        return Array.from(map.values());
+      if (Array.isArray(data.records)) {
+        // Authoritative server state — update local cache
+        cacheStudentRoster(data.records);
+        return data.records;
       }
     }
   } catch (error) {
     console.warn("Server records fetch notice (falling back to cache):", error);
   }
 
-  // Fallback to local cache and baseline roster
-  const map = new Map<string, StudentPerformanceRecord>();
-  BASELINE_ROSTER.forEach((item) => map.set(item.id, item));
-  localList.forEach((item) => map.set(item.id, item));
-  return Array.from(map.values());
+  // Fallback to local cache if offline or unauthenticated
+  const localList = getCachedStudentRoster();
+  return localList;
+}
+
+/**
+ * Delete a single student record from server and cache (Teacher Authenticated).
+ */
+export async function deleteStudentRecordOnServer(
+  id: string
+): Promise<{ success: boolean; records?: StudentPerformanceRecord[]; error?: string }> {
+  try {
+    const res = await fetch("/api/student/records", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      deleteCachedStudentRecord(id);
+      if (Array.isArray(data.records)) {
+        cacheStudentRoster(data.records);
+      }
+      return { success: true, records: data.records };
+    }
+    return { success: false, error: data.error || "Failed to delete record." };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Network error during deletion." };
+  }
+}
+
+/**
+ * Clear ALL student records from server and cache (Teacher Authenticated).
+ */
+export async function clearAllStudentRecordsOnServer(): Promise<{
+  success: boolean;
+  records?: StudentPerformanceRecord[];
+  error?: string;
+}> {
+  try {
+    const res = await fetch("/api/student/records", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ all: true }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      clearCachedStudentRoster();
+      return { success: true, records: [] };
+    }
+    return { success: false, error: data.error || "Failed to clear records." };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Network error during clear." };
+  }
+}
+
+/**
+ * Reset student records to default CBSE sample benchmark roster (Teacher Authenticated).
+ */
+export async function resetStudentRecordsOnServer(): Promise<{
+  success: boolean;
+  records?: StudentPerformanceRecord[];
+  error?: string;
+}> {
+  try {
+    const res = await fetch("/api/student/records", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resetBaseline: true }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      if (Array.isArray(data.records)) {
+        cacheStudentRoster(data.records);
+      }
+      return { success: true, records: data.records };
+    }
+    return { success: false, error: data.error || "Failed to reset records." };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Network error during reset." };
+  }
 }

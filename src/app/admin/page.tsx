@@ -29,10 +29,18 @@ import {
   Printer,
   FileText,
   ShieldCheck,
-  Check
+  Check,
+  Trash2,
+  AlertOctagon,
+  RotateCcw
 } from "lucide-react";
 import { StudentPerformanceRecord } from "@/lib/student-session";
-import { fetchAllStudentRecords } from "@/lib/firebase";
+import {
+  fetchAllStudentRecords,
+  deleteStudentRecordOnServer,
+  clearAllStudentRecordsOnServer,
+  resetStudentRecordsOnServer,
+} from "@/lib/firebase";
 
 export default function AdminDashboardPage() {
   const topics = getAllTopics();
@@ -50,6 +58,13 @@ export default function AdminDashboardPage() {
   const [selectedSection, setSelectedSection] = useState("ALL");
   const [selectedTier, setSelectedTier] = useState("ALL");
   const [selectedStudentModal, setSelectedStudentModal] = useState<StudentPerformanceRecord | null>(null);
+
+  // Deletion & Data Management State
+  const [recordToDelete, setRecordToDelete] = useState<StudentPerformanceRecord | null>(null);
+  const [showClearAllModal, setShowClearAllModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionFeedback, setActionFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Check server-verified PIN auth on mount
   useEffect(() => {
@@ -104,6 +119,84 @@ export default function AdminDashboardPage() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const handleDeleteSingle = async () => {
+    if (!recordToDelete) return;
+    setActionLoading(true);
+    const res = await deleteStudentRecordOnServer(recordToDelete.id);
+    setActionLoading(false);
+    if (res.success) {
+      if (res.records) {
+        setRecords(res.records);
+      } else {
+        setRecords((prev) => prev.filter((r) => r.id !== recordToDelete.id));
+      }
+      if (selectedStudentModal?.id === recordToDelete.id) {
+        setSelectedStudentModal(null);
+      }
+      const deletedName = recordToDelete.studentName;
+      const deletedRoll = recordToDelete.rollNo;
+      setRecordToDelete(null);
+      setActionFeedback({
+        type: "success",
+        message: `Record for ${deletedName} (Roll #${deletedRoll}) successfully deleted.`,
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    } else {
+      setActionFeedback({
+        type: "error",
+        message: res.error || "Failed to delete student record.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    }
+  };
+
+  const handleClearAll = async () => {
+    setActionLoading(true);
+    const res = await clearAllStudentRecordsOnServer();
+    setActionLoading(false);
+    if (res.success) {
+      setRecords([]);
+      setSelectedStudentModal(null);
+      setShowClearAllModal(false);
+      setActionFeedback({
+        type: "success",
+        message: "All student test records cleared successfully.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    } else {
+      setActionFeedback({
+        type: "error",
+        message: res.error || "Failed to clear student records.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    }
+  };
+
+  const handleResetBaseline = async () => {
+    setActionLoading(true);
+    const res = await resetStudentRecordsOnServer();
+    setActionLoading(false);
+    if (res.success) {
+      if (res.records) {
+        setRecords(res.records);
+      } else {
+        await loadStudentRecords();
+      }
+      setShowResetModal(false);
+      setActionFeedback({
+        type: "success",
+        message: "Roster reset to default CBSE Class 8 benchmark data.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    } else {
+      setActionFeedback({
+        type: "error",
+        message: res.error || "Failed to reset sample data.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
     }
   };
 
@@ -292,14 +385,24 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={handleLock}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-rose-300 transition-all"
-            title="Lock Dashboard"
+            onClick={() => setShowResetModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all"
+            title="Reset to Benchmark CBSE Demo Roster"
           >
-            <Lock className="w-3.5 h-3.5 text-rose-400" />
-            <span>Lock</span>
+            <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+            <span className="hidden sm:inline">Reset Demo</span>
+          </button>
+
+          <button
+            onClick={() => setShowClearAllModal(true)}
+            disabled={records.length === 0}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 disabled:opacity-40 border border-rose-500/30 text-xs font-semibold text-rose-300 transition-all"
+            title="Purge all student performance records"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+            <span>Clear Old Data</span>
           </button>
 
           <button
@@ -314,13 +417,48 @@ export default function AdminDashboardPage() {
           <button
             onClick={handleExportCSV}
             disabled={filteredRecords.length === 0}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
           </button>
+
+          <button
+            onClick={handleLock}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-rose-300 transition-all"
+            title="Lock Dashboard"
+          >
+            <Lock className="w-3.5 h-3.5 text-rose-400" />
+            <span>Lock</span>
+          </button>
         </div>
       </div>
+
+      {/* Action Feedback Banner */}
+      {actionFeedback && (
+        <div
+          className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2 border transition-all no-print ${
+            actionFeedback.type === "success"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+              : "bg-rose-500/10 border-rose-500/30 text-rose-300"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {actionFeedback.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <AlertOctagon className="w-4 h-4 text-rose-400" />
+            )}
+            <span>{actionFeedback.message}</span>
+          </div>
+          <button
+            onClick={() => setActionFeedback(null)}
+            className="text-slate-400 hover:text-white px-2 py-0.5 rounded hover:bg-slate-800 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Analytics KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 no-print">
@@ -461,16 +599,29 @@ export default function AdminDashboardPage() {
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedStudentModal(std);
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white text-xs font-semibold transition-colors inline-flex items-center gap-1"
-                        >
-                          <span>Report</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedStudentModal(std);
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white text-xs font-semibold transition-colors inline-flex items-center gap-1"
+                          >
+                            <span>Report</span>
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setRecordToDelete(std);
+                            }}
+                            className="p-1 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700/60 hover:border-rose-500/40 transition-colors"
+                            title={`Delete record for ${std.studentName} (Roll #${std.rollNo})`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -641,10 +792,140 @@ export default function AdminDashboardPage() {
               </button>
 
               <button
+                onClick={() => setRecordToDelete(selectedStudentModal)}
+                className="px-4 py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all"
+                title="Delete this record"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                <span>Delete</span>
+              </button>
+
+              <button
                 onClick={() => setSelectedStudentModal(null)}
                 className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Single Record Confirmation Modal */}
+      {recordToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
+          <div className="w-full max-w-md bg-slate-900 border border-rose-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-bold text-white tracking-tight">Delete Student Record?</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Kya aap <span className="font-semibold text-white">{recordToDelete.studentName}</span> (Roll #{recordToDelete.rollNo}, Section {recordToDelete.section}) ka yeh performance record permanently remove karna chahte hain?
+              </p>
+              <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-left text-xs text-slate-300 space-y-1">
+                <div><span className="text-slate-500">Topic:</span> {recordToDelete.topicTitle}</div>
+                <div><span className="text-slate-500">Mastery:</span> {recordToDelete.masteryPct}% · Ability: {recordToDelete.theta}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setRecordToDelete(null)}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteSingle}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all"
+              >
+                {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                <span>Confirm Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear All Old Data Confirmation Modal */}
+      {showClearAllModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
+          <div className="w-full max-w-md bg-slate-900 border border-rose-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
+              <AlertOctagon className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-bold text-white tracking-tight">Clear All Student Records?</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Yeh action dashboard ke <span className="font-semibold text-rose-400">sabhi {records.length} student records</span> ko permanently delete kar dega. Naye session ya fresh testing start karne ke liye purana data clean ho jayega.
+              </p>
+              <p className="text-[11px] text-amber-400/90 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
+                ⚠️ Note: Aap baad mein kabhi bhi sample benchmark roster ko &ldquo;Reset Demo&rdquo; button se restore kar sakte hain.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowClearAllModal(false)}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleClearAll}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all"
+              >
+                {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                <span>Yes, Clear Everything</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset to Default Demo Roster Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
+          <div className="w-full max-w-md bg-slate-900 border border-indigo-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mx-auto text-indigo-400">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-bold text-white tracking-tight">Reset to CBSE Demo Benchmark?</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Isse CBSE Class 8 ke standard sample students (Aarav, Priya, Rohan, Ananya, Kabir) ka benchmark diagnostic roster dobara load ho jayega.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleResetBaseline}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all"
+              >
+                {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+                <span>Reset Demo Roster</span>
               </button>
             </div>
           </div>

@@ -72,3 +72,19 @@ export function cacheStudentRoster(records: StudentPerformanceRecord[]): void {
     localStorage.setItem(ROSTER_KEY, JSON.stringify(records));
   } catch {}
 }
+
+export function deleteCachedStudentRecord(id: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const list = getCachedStudentRoster();
+    const updated = list.filter((r) => r.id !== id);
+    localStorage.setItem(ROSTER_KEY, JSON.stringify(updated));
+  } catch {}
+}
+
+export function clearCachedStudentRoster(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(ROSTER_KEY);
+  } catch {}
+}
