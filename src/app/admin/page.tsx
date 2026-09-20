@@ -32,7 +32,8 @@ import {
   Check,
   Trash2,
   AlertOctagon,
-  RotateCcw
+  RotateCcw,
+  UserPlus
 } from "lucide-react";
 import { StudentPerformanceRecord } from "@/lib/student-session";
 import {
@@ -40,6 +41,7 @@ import {
   deleteStudentRecordOnServer,
   clearAllStudentRecordsOnServer,
   resetStudentRecordsOnServer,
+  addStudentRecordOnServer,
 } from "@/lib/firebase";
 
 export default function AdminDashboardPage() {
@@ -58,6 +60,13 @@ export default function AdminDashboardPage() {
   const [selectedSection, setSelectedSection] = useState("ALL");
   const [selectedTier, setSelectedTier] = useState("ALL");
   const [selectedStudentModal, setSelectedStudentModal] = useState<StudentPerformanceRecord | null>(null);
+
+  // Add Student Modal State
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentRoll, setNewStudentRoll] = useState("");
+  const [newStudentSection, setNewStudentSection] = useState("8-A");
+  const [newStudentTopic, setNewStudentTopic] = useState("rational-numbers");
 
   // Deletion & Data Management State
   const [recordToDelete, setRecordToDelete] = useState<StudentPerformanceRecord | null>(null);
@@ -195,6 +204,44 @@ export default function AdminDashboardPage() {
       setActionFeedback({
         type: "error",
         message: res.error || "Failed to reset sample data.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    }
+  };
+
+  const handleAddStudentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStudentName.trim() || !newStudentRoll.trim()) return;
+
+    setActionLoading(true);
+    const chosenTopic = topics.find((t) => t.id === newStudentTopic) || topics[0];
+    const res = await addStudentRecordOnServer({
+      studentName: newStudentName.trim(),
+      rollNo: newStudentRoll.trim(),
+      section: newStudentSection,
+      topicId: chosenTopic ? chosenTopic.id : "rational-numbers",
+      topicTitle: chosenTopic ? chosenTopic.title : "Class 8 Mathematics",
+    });
+    setActionLoading(false);
+
+    if (res.success) {
+      if (res.records) {
+        setRecords(res.records);
+      } else if (res.record) {
+        setRecords((prev) => [res.record!, ...prev]);
+      }
+      setShowAddStudentModal(false);
+      setNewStudentName("");
+      setNewStudentRoll("");
+      setActionFeedback({
+        type: "success",
+        message: `Student "${newStudentName.trim()}" (Roll #${newStudentRoll.trim()}) added to roster successfully!`,
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    } else {
+      setActionFeedback({
+        type: "error",
+        message: res.error || "Failed to add student.",
       });
       setTimeout(() => setActionFeedback(null), 4000);
     }
@@ -403,6 +450,15 @@ export default function AdminDashboardPage() {
           >
             <Trash2 className="w-3.5 h-3.5 text-rose-400" />
             <span>Clear Old Data</span>
+          </button>
+
+          <button
+            onClick={() => setShowAddStudentModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all"
+            title="Register a new student directly into the roster"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>+ Add Student</span>
           </button>
 
           <button
@@ -928,6 +984,101 @@ export default function AdminDashboardPage() {
                 <span>Reset Demo Roster</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Student Modal */}
+      {showAddStudentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2 text-indigo-400">
+                <UserPlus className="w-5 h-5" />
+                <h3 className="text-base font-bold text-white">Add New Student</h3>
+              </div>
+              <button
+                onClick={() => setShowAddStudentModal(false)}
+                className="text-slate-400 hover:text-white text-xs px-2.5 py-1 rounded-lg bg-slate-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddStudentSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300">Student Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Ramesh Kumar"
+                  value={newStudentName}
+                  onChange={(e) => setNewStudentName(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 text-white text-sm outline-none transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">Roll Number *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 19"
+                    value={newStudentRoll}
+                    onChange={(e) => setNewStudentRoll(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 text-white text-sm outline-none transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">Section *</label>
+                  <select
+                    value={newStudentSection}
+                    onChange={(e) => setNewStudentSection(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 text-white text-sm outline-none transition-all"
+                  >
+                    <option value="8-A">Class 8-A</option>
+                    <option value="8-B">Class 8-B</option>
+                    <option value="8-C">Class 8-C</option>
+                    <option value="8-D">Class 8-D</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300">Initial Topic</label>
+                <select
+                  value={newStudentTopic}
+                  onChange={(e) => setNewStudentTopic(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 text-white text-sm outline-none transition-all"
+                >
+                  {topics.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.subject}: {t.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowAddStudentModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading || !newStudentName.trim() || !newStudentRoll.trim()}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all"
+                >
+                  {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                  <span>Add Student</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

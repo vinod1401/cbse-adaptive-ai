@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import {
   StudentProfile,
+  StudentPerformanceRecord,
   getSavedStudentProfile,
   saveStudentProfile,
 } from "@/lib/student-session";
@@ -166,6 +167,52 @@ function PracticeContent() {
     }
   }, []);
 
+  const initSession = async (studentOverride?: StudentProfile) => {
+    setLoading(true);
+    setSelectedOption(null);
+    setFeedback(null);
+
+    let localProfile = null;
+    try {
+      const saved = localStorage.getItem("pragati_profiles");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        localProfile = parsed[topicId] || null;
+      }
+    } catch (e) {}
+
+    const std = studentOverride || studentProfile || getSavedStudentProfile();
+
+    try {
+      const res = await fetch("/api/adaptive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "start",
+          topicId,
+          currentProfile: localProfile,
+          seenIds: [],
+          student: std ? { studentId: std.id, rollNo: std.rollNo, section: std.section } : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.item) {
+        setTopicMeta(data.topic);
+        setCurrentItem(data.item);
+        setProfile(data.profile);
+        if (data.signature) setProfileSignature(data.signature);
+        setMasteryPct(data.masteryPct);
+        setTier(data.tier);
+        setStartTime(Date.now());
+        setSeenIds([data.item.id]);
+      }
+    } catch (e) {
+      console.error("Init failed:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSaveStudentProfile = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputName.trim() || !inputRoll.trim()) return;
@@ -187,55 +234,33 @@ function PracticeContent() {
     setStudentProfile(newProf);
     saveStudentProfile(newProf);
     setShowProfileModal(false);
+
+    // 1. Immediately register student in authoritative store and roster
+    const docId = `${newProf.rollNo}_${newProf.section}_${topicId}`.replace(/\s+/g, "_");
+    const regRecord: StudentPerformanceRecord = {
+      id: docId,
+      studentId: newProf.id,
+      studentName: newProf.name,
+      rollNo: newProf.rollNo,
+      section: newProf.section,
+      topicId,
+      topicTitle: topicMeta?.title || "Class 8 Mathematics",
+      theta: -2.0,
+      masteryPct: 15,
+      tier: { label: "Foundation", badge: "🟢 Level 1: Foundation" },
+      questionsAttempted: 0,
+      correctAnswers: 0,
+      accuracyPct: 0,
+      lastActive: "Just registered",
+      flaggedMisconceptions: [],
+    };
+    syncStudentPerformance(regRecord).catch(() => {});
+
+    // 2. Re-initialize adaptive session with this registered student identity
+    initSession(newProf);
   };
 
   useEffect(() => {
-    async function initSession() {
-      setLoading(true);
-      setSelectedOption(null);
-      setFeedback(null);
-
-      let localProfile = null;
-      try {
-        const saved = localStorage.getItem("pragati_profiles");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          localProfile = parsed[topicId] || null;
-        }
-      } catch (e) {}
-
-      const std = studentProfile || getSavedStudentProfile();
-
-      try {
-        const res = await fetch("/api/adaptive", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "start",
-            topicId,
-            currentProfile: localProfile,
-            seenIds: [],
-            student: std ? { studentId: std.id, rollNo: std.rollNo, section: std.section } : undefined,
-          }),
-        });
-        const data = await res.json();
-        if (res.ok && data.item) {
-          setTopicMeta(data.topic);
-          setCurrentItem(data.item);
-          setProfile(data.profile);
-          if (data.signature) setProfileSignature(data.signature);
-          setMasteryPct(data.masteryPct);
-          setTier(data.tier);
-          setStartTime(Date.now());
-          setSeenIds([data.item.id]);
-        }
-      } catch (e) {
-        console.error("Init failed:", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     initSession();
   }, [topicId]);
 

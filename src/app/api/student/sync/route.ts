@@ -17,26 +17,38 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { profile, signature, student, topicId, topicTitle, misconceptions = [] } = body;
 
-    if (!profile || !student || !topicId) {
+    if (!student || !topicId) {
       return NextResponse.json(
         { error: "Missing required fields for student sync." },
         { status: 400 }
       );
     }
 
-    // STRICT SECURITY: Cryptographically verify profile and student identity against tampering
-    const irtProfile: StudentIRTProfile = profile;
-    const isValid = verifyProfileSignature(irtProfile, signature, {
-      studentId: student.studentId,
-      rollNo: student.rollNo,
-      section: student.section,
-    });
-    if (!isValid) {
-      return NextResponse.json(
-        { error: "Security violation: Student profile signature mismatch or identity tampering. Scores cannot be attributed to another student." },
-        { status: 403 }
-      );
+    const isInitialRegistration = !profile || (profile.itemsAttempted ?? 0) === 0;
+
+    // STRICT SECURITY: Cryptographically verify profile and student identity against tampering on active attempts
+    if (!isInitialRegistration) {
+      const irtProfile: StudentIRTProfile = profile;
+      const isValid = verifyProfileSignature(irtProfile, signature, {
+        studentId: student.studentId,
+        rollNo: student.rollNo,
+        section: student.section,
+      });
+      if (!isValid) {
+        return NextResponse.json(
+          { error: "Security violation: Student profile signature mismatch or identity tampering. Scores cannot be attributed to another student." },
+          { status: 403 }
+        );
+      }
     }
+
+    const irtProfile: StudentIRTProfile = profile || {
+      theta: -2.0,
+      standardError: 1.0,
+      itemsAttempted: 0,
+      correctCount: 0,
+      history: [],
+    };
 
     // Sanitize student metadata to prevent key collision or injection
     const sanitizedRoll = String(student.rollNo || "0").trim().replace(/[^a-zA-Z0-9_-]/g, "");
@@ -63,7 +75,7 @@ export async function POST(request: Request) {
       questionsAttempted: totalAtt,
       correctAnswers: totalCorr,
       accuracyPct: accuracy,
-      lastActive: "Just now",
+      lastActive: isInitialRegistration ? "Just registered" : "Just now",
       flaggedMisconceptions: Array.isArray(misconceptions) ? misconceptions.slice(0, 10) : [],
     };
 

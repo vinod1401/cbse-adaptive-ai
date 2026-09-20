@@ -13,8 +13,8 @@ import {
   cacheStudentRoster,
   deleteCachedStudentRecord,
   clearCachedStudentRoster,
+  BASELINE_ROSTER,
 } from "./student-session";
-import { BASELINE_ROSTER } from "./student-records-store";
 
 export { BASELINE_ROSTER };
 
@@ -180,3 +180,33 @@ export async function resetStudentRecordsOnServer(): Promise<{
     return { success: false, error: error.message || "Network error during reset." };
   }
 }
+
+/**
+ * Add a new student record to server and cache (Teacher Authenticated).
+ */
+export async function addStudentRecordOnServer(student: {
+  studentName: string;
+  rollNo: string;
+  section: string;
+  topicId?: string;
+  topicTitle?: string;
+}): Promise<{ success: boolean; record?: StudentPerformanceRecord; records?: StudentPerformanceRecord[]; error?: string }> {
+  try {
+    const res = await fetch("/api/student/records", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(student),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      if (Array.isArray(data.records)) {
+        cacheStudentRoster(data.records);
+      }
+      return { success: true, record: data.record, records: data.records };
+    }
+    return { success: false, error: data.error || "Failed to add student record." };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Network error while adding student." };
+  }
+}
+
