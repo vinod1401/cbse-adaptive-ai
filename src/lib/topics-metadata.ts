@@ -70,6 +70,24 @@ export const TOPICS_METADATA: ConceptTopic[] = [
     "itemCount": 17
   },
   {
+    "id": "squares-and-square-roots",
+    "subject": "Mathematics",
+    "chapter": "Chapter 5: Squares and Square Roots",
+    "title": "Squares, Square Roots & Division Algorithm",
+    "subtopics": [
+      "Properties of Squares & 2n Gap",
+      "Repeated Subtraction & Factorisation",
+      "Divisibility & Smallest Multiplier/Divisor",
+      "Long Division Method & Approximations",
+      "Fractions, Decimals & Word Problems"
+    ],
+    "description": "Properties of perfect squares, prime factorisation tests, long division algorithm, and decimal roots.",
+    "icon": "Square",
+    "color": "sky",
+    "microTheory": "A square number is $n^2 = n \\times n$. It always has an odd number of factors and unit digit in $\\{0, 1, 4, 5, 6, 9\\}$. Between $n^2$ and $(n+1)^2$, there are $2n$ non-square numbers. Sum of first $n$ odd numbers is $n^2$. Square roots are found via prime factorisation, repeated subtraction, or the long division algorithm.",
+    "itemCount": 17
+  },
+  {
     "id": "algebraic-identities",
     "subject": "Mathematics",
     "chapter": "Chapter 9: Algebraic Expressions & Identities",

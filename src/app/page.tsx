@@ -109,7 +109,7 @@ export default function HomePage() {
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white">7 Core CBSE Subjects</h4>
-              <p className="text-xs text-slate-400">357+ Questions · Maths, Sci, Eng, SST, Hin, Sans, CS</p>
+              <p className="text-xs text-slate-400">374+ Questions · Maths, Sci, Eng, SST, Hin, Sans, CS</p>
             </div>
           </div>
 

@@ -2,7 +2,7 @@
 // CBSE CLASS 8 COMPREHENSIVE ADAPTIVE QUESTION BANK
 // Subjects (7 Core): Mathematics, Science, English, Social Science, Hindi, Sanskrit, Computer Science
 // Psychometric IRT Calibrated Difficulty parameters (b: -2.5 to +2.5)
-// Total Questions: 357 Calibrated Items across 21 Curriculum Topics
+// Total Questions: 374 Calibrated Items across 22 Curriculum Topics
 // ============================================================================
 
 import { IRTItem } from "./irt-engine";
@@ -936,6 +936,315 @@ export const CONCEPT_BANK: ConceptTopic[] = [
         "explanation": "Let exterior = e, interior = i. i + e = 180° and i - e = 108°. Adding gives 2i = 288° => i = 144°, e = 36°. Number of sides n = 360° / 36° = 10 sides (decagon).",
         "misconceptions": {
           "$8$": "For an octagon, e = 360/8 = 45°, i = 135°, difference = 135 - 45 = 90°, not 108°."
+        }
+      }
+    ]
+  },
+  {
+    "id": "squares-and-square-roots",
+    "subject": "Mathematics",
+    "chapter": "Chapter 5: Squares and Square Roots",
+    "title": "Squares, Square Roots & Division Algorithm",
+    "subtopics": [
+      "Properties of Squares & 2n Gap",
+      "Repeated Subtraction & Factorisation",
+      "Divisibility & Smallest Multiplier/Divisor",
+      "Long Division Method & Approximations",
+      "Fractions, Decimals & Word Problems"
+    ],
+    "description": "Properties of perfect squares, prime factorisation tests, long division algorithm, and decimal roots.",
+    "icon": "Square",
+    "color": "sky",
+    "microTheory": "A square number is $n^2 = n \\times n$. It always has an odd number of factors and unit digit in $\\{0, 1, 4, 5, 6, 9\\}$. Between $n^2$ and $(n+1)^2$, there are $2n$ non-square numbers. Sum of first $n$ odd numbers is $n^2$. Square roots are found via prime factorisation, repeated subtraction, or the long division algorithm.",
+    "items": [
+      {
+        "id": "sqr-1",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -2.4,
+        "text": "Which of the following statements is TRUE for any perfect square number?",
+        "options": [
+          "It always has an odd number of factors",
+          "It always has an even number of factors",
+          "It can never be an even number",
+          "It must always end with an odd digit"
+        ],
+        "correctAnswer": "It always has an odd number of factors",
+        "explanation": "Factors of a non-square number always come in distinct pairs (a, b) where a * b = n. For a perfect square n = k^2, the factor k pairs with itself (k * k = n), making the total number of distinct factors odd. For example, 16 has 5 factors: 1, 2, 4, 8, 16.",
+        "misconceptions": {
+          "It always has an even number of factors": "Ordinary numbers have an even number of factors because they pair up. Only perfect squares have an odd number of factors due to the repeated square root."
+        }
+      },
+      {
+        "id": "sqr-2",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -2,
+        "text": "Which of the following digits can NEVER appear in the units place of a perfect square number?",
+        "options": [
+          "$8$",
+          "$6$",
+          "$9$",
+          "$1$"
+        ],
+        "correctAnswer": "$8$",
+        "explanation": "The square of any natural number can only end in 0, 1, 4, 5, 6, or 9. Numbers ending in 2, 3, 7, or 8 can never be perfect squares. Therefore, 8 can never be the unit digit.",
+        "misconceptions": {
+          "$6$": "$4^2 = 16$ and $6^2 = 36$ both end in 6, so 6 is a valid unit digit of a perfect square."
+        }
+      },
+      {
+        "id": "sqr-3",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -1.7,
+        "text": "Which of the following numbers can NOT be a perfect square solely by examining the number of zeros at the end?",
+        "options": [
+          "$4000$",
+          "$400$",
+          "$90000$",
+          "$2500$"
+        ],
+        "correctAnswer": "$4000$",
+        "explanation": "A perfect square must end with an even number of zeros. $4000$ ends with 3 zeros (an odd count), so it cannot be a perfect square ($400 = 20^2$, $90000 = 300^2$, and $2500 = 50^2$ all have an even number of zeros).",
+        "misconceptions": {
+          "$90000$": "$90000$ ends with 4 zeros (an even count), and $300^2 = 90000$."
+        }
+      },
+      {
+        "id": "sqr-4",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -1.4,
+        "text": "Using the textbook identity for squaring numbers ending in 5: $(a5)^2 = [a \\times (a + 1)] \\text{ hundreds} + 25$, what is the value of $95^2$?",
+        "options": [
+          "$9025$",
+          "$8525$",
+          "$9125$",
+          "$8925$"
+        ],
+        "correctAnswer": "$9025$",
+        "explanation": "Here a = 9. We compute a * (a + 1) = 9 * 10 = 90 hundreds = 9000. Adding 25 gives 9025. Thus, $95^2 = 9025$.",
+        "misconceptions": {
+          "$8525$": "Multiply a by (a + 1), which is 9 * 10 = 90, not 9 * 9 = 81."
+        }
+      },
+      {
+        "id": "sqr-5",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -1.1,
+        "text": "How many natural numbers lie between $25^2$ and $26^2$?",
+        "options": [
+          "$50$",
+          "$49$",
+          "$51$",
+          "$52$"
+        ],
+        "correctAnswer": "$50$",
+        "explanation": "Between $n^2$ and $(n+1)^2$, there are always $2n$ non-square natural numbers. For $n = 25$, count $= 2 \\times 25 = 50$. (Checking: $26^2 - 25^2 - 1 = 676 - 625 - 1 = 50$).",
+        "misconceptions": {
+          "$51$": "Subtracting $676 - 625 = 51$ includes one boundary. To find numbers strictly between, subtract 1: $51 - 1 = 50$."
+        }
+      },
+      {
+        "id": "sqr-6",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -0.8,
+        "text": "What is the value of the sum $1 + 3 + 5 + 7 + 9 + 11 + 13 + 15$ without actual addition?",
+        "options": [
+          "$64$",
+          "$49$",
+          "$81$",
+          "$56$"
+        ],
+        "correctAnswer": "$64$",
+        "explanation": "This is the sum of the first 8 consecutive odd natural numbers (n = 8). The sum of the first n odd natural numbers equals $n^2 = 8^2 = 64$.",
+        "misconceptions": {
+          "$49$": "Count the number of terms: there are 8 terms, not 7 ($7^2 = 49$)."
+        }
+      },
+      {
+        "id": "sqr-7",
+        "topicId": "squares-and-square-roots",
+        "difficulty": -0.4,
+        "text": "Given that $125^2 = 15625$, which expression gives the exact value of $126^2$ using consecutive square properties?",
+        "options": [
+          "$15625 + 251$",
+          "$15625 + 126$",
+          "$15625 + 253$",
+          "$15625 + 26^2$"
+        ],
+        "correctAnswer": "$15625 + 251$",
+        "explanation": "For consecutive integers, $(n+1)^2 = n^2 + [(n+1) + n] = n^2 + (2n + 1)$. Here $126^2 = 125^2 + (126 + 125) = 15625 + 251 = 15876$.",
+        "misconceptions": {
+          "$15625 + 126$": "The difference between $(n+1)^2$ and $n^2$ is $(n+1) + n = 251$, not just $(n+1)$."
+        }
+      },
+      {
+        "id": "sqr-8",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 0,
+        "text": "Evaluate the nested square root: $\\sqrt{208 + \\sqrt{2304}}$",
+        "options": [
+          "$16$",
+          "$18$",
+          "$14$",
+          "$22$"
+        ],
+        "correctAnswer": "$16$",
+        "explanation": "First evaluate the inner square root: $\\sqrt{2304} = 48$ (since $48^2 = 2304$). Now substitute: $\\sqrt{208 + 48} = \\sqrt{256} = 16$.",
+        "misconceptions": {
+          "$18$": "$18^2 = 324$, which is not 256."
+        }
+      },
+      {
+        "id": "sqr-9",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 0.4,
+        "text": "Find the smallest natural number by which $75$ should be divided so that the quotient is a perfect square.",
+        "options": [
+          "$3$",
+          "$5$",
+          "$1$",
+          "$2$"
+        ],
+        "correctAnswer": "$3$",
+        "explanation": "Prime factorisation of $75 = 3 \\times 5^2$. The prime factor 5 is paired ($5^2$), while 3 is unpaired. Dividing 75 by 3 gives $25 = 5^2$, which is a perfect square.",
+        "misconceptions": {
+          "$5$": "Dividing 75 by 5 leaves 15, which is not a perfect square because 3 and 5 are both unpaired."
+        }
+      },
+      {
+        "id": "sqr-10",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 0.7,
+        "text": "Given that $\\sqrt{1521} = 39$, what is the value of $\\sqrt{0.1521} + \\sqrt{15.21}$?",
+        "options": [
+          "$4.29$",
+          "$3.51$",
+          "$42.9$",
+          "$35.1$"
+        ],
+        "correctAnswer": "$4.29$",
+        "explanation": "$\\sqrt{0.1521} = \\frac{39}{100} = 0.39$ and $\\sqrt{15.21} = \\frac{39}{10} = 3.9$. Adding them gives $0.39 + 3.9 = 4.29$.",
+        "misconceptions": {
+          "$3.51$": "Be careful with decimal addition: $0.39 + 3.90 = 4.29$, not 3.51."
+        }
+      },
+      {
+        "id": "sqr-11",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1,
+        "text": "Find the smallest square number that is divisible by each of $6$, $9$, and $15$.",
+        "options": [
+          "$900$",
+          "$90$",
+          "$180$",
+          "$3600$"
+        ],
+        "correctAnswer": "$900$",
+        "explanation": "First find $\\text{LCM}(6, 9, 15) = 90$. Prime factorisation: $90 = 2 \\times 3^2 \\times 5$. To make each factor paired, multiply 90 by $2 \\times 5 = 10$, giving $900 = 30^2$.",
+        "misconceptions": {
+          "$90$": "90 is the LCM, but not a perfect square since 2 and 5 are unpaired."
+        }
+      },
+      {
+        "id": "sqr-12",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1.3,
+        "text": "The students of Class VIII donated ₹$2401$ in all for the National Relief Fund. Each student donated as many rupees as the number of students in the class. How many students are in the class?",
+        "options": [
+          "$49$",
+          "$41$",
+          "$51$",
+          "$59$"
+        ],
+        "correctAnswer": "$49$",
+        "explanation": "Let the number of students be x. Total donation $= x \\times x = x^2 = 2401$. Taking the square root, $x = \\sqrt{2401} = 49$ students.",
+        "misconceptions": {
+          "$51$": "$50^2 = 2500$. Since $2401 < 2500$, x must be less than 50 ($49^2 = 2401$)."
+        }
+      },
+      {
+        "id": "sqr-13",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1.6,
+        "text": "Evaluate the square root of the mixed fraction: $\\sqrt{3\\frac{6}{25}}$",
+        "options": [
+          "$\\frac{9}{5}$",
+          "$\\frac{5}{9}$",
+          "$\\frac{4}{5}$",
+          "$\\frac{5}{4}$"
+        ],
+        "correctAnswer": "$\\frac{9}{5}$",
+        "explanation": "Convert to an improper fraction: $3\\frac{6}{25} = \\frac{3 \\times 25 + 6}{25} = \\frac{81}{25}$. Then $\\sqrt{\\frac{81}{25}} = \\frac{\\sqrt{81}}{\\sqrt{25}} = \\frac{9}{5}$.",
+        "misconceptions": {
+          "$\\frac{5}{9}$": "That is the reciprocal of the square root."
+        }
+      },
+      {
+        "id": "sqr-14",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 1.8,
+        "text": "A $6\\text{ m}$ long ladder leans against a vertical wall, reaching a height of $4.8\\text{ m}$. What is the distance between the foot of the ladder and the wall?",
+        "options": [
+          "$3.6\\text{ m}$",
+          "$3.2\\text{ m}$",
+          "$2.4\\text{ m}$",
+          "$4.2\\text{ m}$"
+        ],
+        "correctAnswer": "$3.6\\text{ m}$",
+        "explanation": "By Pythagoras theorem, $(\\text{ladder})^2 = (\\text{height})^2 + (\\text{base})^2 \\implies 6^2 = 4.8^2 + b^2 \\implies 36 = 23.04 + b^2$. Thus $b^2 = 12.96 \\implies b = \\sqrt{12.96} = 3.6\\text{ m}$.",
+        "misconceptions": {
+          "$2.4\\text{ m}$": "Subtracting $6 - 4.8 = 1.2$ instead of applying Pythagoras theorem ($c^2 = a^2 + b^2$)."
+        }
+      },
+      {
+        "id": "sqr-15",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 2.1,
+        "text": "There are $1000$ children in a school. For a P.T. drill, they have to stand in such a way that the number of rows equals the number of columns. How many children would be left out in this arrangement?",
+        "options": [
+          "$39$",
+          "$24$",
+          "$64$",
+          "$31$"
+        ],
+        "correctAnswer": "$39$",
+        "explanation": "Find the largest perfect square $\\le 1000$. By long division, $31^2 = 961 < 1000 < 32^2 = 1024$. The square drill uses 961 children ($31 \\times 31$). Children left out $= 1000 - 961 = 39$.",
+        "misconceptions": {
+          "$31$": "31 is the number of rows/columns in the formation, not the number of children left out.",
+          "$24$": "24 is how many more children are needed to make $32^2 = 1024$, not the number left out."
+        }
+      },
+      {
+        "id": "sqr-16",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 2.3,
+        "text": "A gardener has $1400$ plants. He wants to plant them so that the number of rows equals the number of columns. What is the minimum number of additional plants he needs?",
+        "options": [
+          "$44$",
+          "$31$",
+          "$38$",
+          "$40$"
+        ],
+        "correctAnswer": "$44$",
+        "explanation": "Testing squares around 1400: $37^2 = 1369 < 1400 < 38^2 = 1444$. To form a complete square without removing any plants, he needs the next square: $38^2 = 1444$. Additional plants needed $= 1444 - 1400 = 44$.",
+        "misconceptions": {
+          "$31$": "$1400 - 1369 = 31$ is the number of excess plants if forming a $37 \\times 37$ square, but the gardener wants to add more plants to complete a larger square."
+        }
+      },
+      {
+        "id": "sqr-17",
+        "topicId": "squares-and-square-roots",
+        "difficulty": 2.5,
+        "text": "If $\\sqrt{2025} + \\sqrt{0.0612 + x} = 45.25$, what is the exact value of $x$?",
+        "options": [
+          "$0.0013$",
+          "$0.013$",
+          "$0.0025$",
+          "$0.0125$"
+        ],
+        "correctAnswer": "$0.0013$",
+        "explanation": "First, $\\sqrt{2025} = 45$ (since $45^2 = 2025$). Substituting: $45 + \\sqrt{0.0612 + x} = 45.25 \\implies \\sqrt{0.0612 + x} = 0.25$. Squaring both sides gives $0.0612 + x = (0.25)^2 = 0.0625$. Solving for x: $x = 0.0625 - 0.0612 = 0.0013$.",
+        "misconceptions": {
+          "$0.013$": "Watch decimal places: $(0.25)^2 = 0.0625$, and $0.0625 - 0.0612 = 0.0013$ (four decimal places, not three)."
         }
       }
     ]

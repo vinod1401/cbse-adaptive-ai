@@ -637,7 +637,7 @@ export default function AdminDashboardPage() {
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-white tracking-tight">Curriculum Concept Bank (7 Core CBSE Subjects)</h3>
           <span className="text-xs px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold font-mono">
-            {topics.length} Topics · 357 Calibrated Questions
+            {topics.length} Topics · {topics.reduce((sum, t) => sum + (t.itemCount || 17), 0)} Calibrated Questions
           </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
