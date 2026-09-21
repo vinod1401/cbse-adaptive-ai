@@ -399,6 +399,25 @@ export const TOPICS_METADATA: ConceptTopic[] = [
     "color": "teal",
     "microTheory": "HTML (HyperText Markup Language) structures web content. `<!DOCTYPE html>` declares HTML5. Anchor tag `<a href='URL'>` creates hyperlinks. `<img>` embeds images using `src` and accessibility `alt`. Lists are `<ol>` (ordered/numbered) and `<ul>` (unordered/bulleted). Tables use `<table>`, `<tr>` (row), and `<td>` (data cell).",
     "itemCount": 17
+  },
+  {
+    "id": "colonial-era-in-india",
+    "subject": "Social Science",
+    "chapter": "History: Chapter 4: The Colonial Era in India",
+    "title": "The Colonial Era in India & Economic Drain",
+    "subtopics": [
+      "European Rivalry & Maritime Resistance",
+      "British Expansion & Annexation Policies",
+      "De-industrialization & Drain of Wealth",
+      "Colonial Famines & Laissez-Faire Dogma",
+      "Transformation of Governance & Education",
+      "Rebellions, 1857 Uprising & Crown Rule"
+    ],
+    "description": "European rivalry, Plassey, Subsidiary Alliance, Doctrine of Lapse, de-industrialization, Drain of Wealth, colonial famines, Macaulay's education policy, tribal/peasant uprisings, and the Great Rebellion of 1857.",
+    "icon": "Globe2",
+    "color": "amber",
+    "microTheory": "Colonialism established foreign resource exploitation and political subjugation. The Portuguese (1498) introduced the Cartaz permit system, resisted by Rani Abbakka of Ullal. Travancore's King Marthanda Varma defeated the Dutch in the 1741 Battle of Colachel. Dupleix trained Indian sepoys and meddled in succession disputes. Victory at Plassey (1757) began British territorial rule, expanded via Subsidiary Alliance and Doctrine of Lapse. British policies caused de-industrialization, massive Drain of Wealth (Dadabhai Naoroji, Utsa Patnaik's $45T calculation), and catastrophic famines (1770 Bengal, 1876 Deccan). In education, Macaulay's 1835 Minute established English dominance. Widespread grievances led to tribal uprisings (Kol, Santhal), the Indigo Revolt, and the 1857 Great Rebellion led by Mangal Pandey, Rani Lakshmibai, and Nana Saheb, resulting in Crown rule in 1858.",
+    "itemCount": 32
   }
 ];
 

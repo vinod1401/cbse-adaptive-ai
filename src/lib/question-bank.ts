@@ -7040,6 +7040,603 @@ export const CONCEPT_BANK: ConceptTopic[] = [
       }
     ]
   }
+,
+  {
+  "id": "colonial-era-in-india",
+  "subject": "Social Science",
+  "chapter": "History: Chapter 4: The Colonial Era in India",
+  "title": "The Colonial Era in India & Economic Drain",
+  "subtopics": [
+    "European Rivalry & Maritime Resistance",
+    "British Expansion & Annexation Policies",
+    "De-industrialization & Drain of Wealth",
+    "Colonial Famines & Laissez-Faire Dogma",
+    "Transformation of Governance & Education",
+    "Rebellions, 1857 Uprising & Crown Rule"
+  ],
+  "description": "European rivalry, Plassey, Subsidiary Alliance, Doctrine of Lapse, de-industrialization, Drain of Wealth, colonial famines, Macaulay's education policy, tribal/peasant uprisings, and the Great Rebellion of 1857.",
+  "icon": "Globe2",
+  "color": "amber",
+  "microTheory": "Colonialism established foreign resource exploitation and political subjugation. The Portuguese (1498) introduced the Cartaz permit system, resisted by Rani Abbakka of Ullal. Travancore's King Marthanda Varma defeated the Dutch in the 1741 Battle of Colachel. Dupleix trained Indian sepoys and meddled in succession disputes. Victory at Plassey (1757) began British territorial rule, expanded via Subsidiary Alliance and Doctrine of Lapse. British policies caused de-industrialization, massive Drain of Wealth (Dadabhai Naoroji, Utsa Patnaik's $45T calculation), and catastrophic famines (1770 Bengal, 1876 Deccan). In education, Macaulay's 1835 Minute established English dominance. Widespread grievances led to tribal uprisings (Kol, Santhal), the Indigo Revolt, and the 1857 Great Rebellion led by Mangal Pandey, Rani Lakshmibai, and Nana Saheb, resulting in Crown rule in 1858.",
+  "items": [
+    {
+      "id": "col-1",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -2.4,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "For which historic event was the Gateway of India in Mumbai built by the British colonial government?",
+      "options": [
+        "The royal visit of King George V and Queen Mary in 1911",
+        "The proclamation of Queen Victoria as Empress of India in 1877",
+        "The signing of the Treaty of Allahabad in 1765",
+        "The victory of the British in the Revolt of 1857"
+      ],
+      "correctAnswer": "The royal visit of King George V and Queen Mary in 1911",
+      "explanation": "The Gateway of India in Mumbai was built to commemorate the arrival and visit of King George V and Queen Mary to India in December 1911.",
+      "misconceptions": {
+        "The proclamation of Queen Victoria as Empress of India in 1877": "The 1877 event was celebrated at the Delhi Durbar, not by erecting the Gateway of India."
+      }
+    },
+    {
+      "id": "col-2",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -2.2,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "Who was the Portuguese explorer who discovered the direct sea route to India, landing at Kappad near Calicut in May 1498?",
+      "options": [
+        "Vasco da Gama",
+        "Christopher Columbus",
+        "Afonso de Albuquerque",
+        "Ferdinand Magellan"
+      ],
+      "correctAnswer": "Vasco da Gama",
+      "explanation": "Vasco da Gama sailed around the Cape of Good Hope and reached Kappad near Calicut (Kozhikode) in May 1498.",
+      "misconceptions": {
+        "Christopher Columbus": "Columbus landed in the Caribbean (Americas) in 1492 while trying to find a sea route to Asia."
+      }
+    },
+    {
+      "id": "col-3",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -2,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "Which queen of the Chowta dynasty of Ullal fought against Portuguese colonial forces for nearly four decades and came to be known as 'Abhaya Rani'?",
+      "options": [
+        "Rani Abbakka I",
+        "Rani Chennamma",
+        "Rani Lakshmibai",
+        "Rani Velu Nachiyar"
+      ],
+      "correctAnswer": "Rani Abbakka I",
+      "explanation": "Rani Abbakka I ruled the coastal town of Ullal in the 16th century, forming alliances with neighboring rulers to defeat Portuguese assaults, earning the title 'Abhaya Rani' (The Fearless Queen).",
+      "misconceptions": {
+        "Rani Chennamma": "Rani Chennamma was the ruler of Kittur who resisted British East India Company annexation in 1824."
+      }
+    },
+    {
+      "id": "col-4",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -1.8,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "In 1741, King Marthanda Varma of Travancore defeated which European colonial power in the famous Battle of Colachel?",
+      "options": [
+        "The Dutch",
+        "The French",
+        "The British",
+        "The Portuguese"
+      ],
+      "correctAnswer": "The Dutch",
+      "explanation": "In the Battle of Colachel (1741), King Marthanda Varma of Travancore decisively defeated the Dutch East India Company, ending Dutch territorial ambitions in India.",
+      "misconceptions": {
+        "The Portuguese": "The Dutch had previously ousted the Portuguese from Cochin, but were themselves defeated by Travancore at Colachel."
+      }
+    },
+    {
+      "id": "col-5",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -1.6,
+      "subtopic": "British Expansion & Annexation Policies",
+      "text": "On 31st December 1600, which English monarch granted a Royal Charter granting the English East India Company exclusive trade rights with the East?",
+      "options": [
+        "Queen Elizabeth I",
+        "Queen Victoria",
+        "King George III",
+        "King James I"
+      ],
+      "correctAnswer": "Queen Elizabeth I",
+      "explanation": "Queen Elizabeth I signed the Royal Charter on 31 December 1600, establishing the Governor and Company of Merchants of London trading into the East Indies.",
+      "misconceptions": {
+        "Queen Victoria": "Queen Victoria assumed direct imperial rule over India much later in 1858."
+      }
+    },
+    {
+      "id": "col-6",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -1.5,
+      "subtopic": "British Expansion & Annexation Policies",
+      "text": "In which year did the Battle of Plassey take place, leading to the defeat of Nawab Siraj-ud-Daulah of Bengal?",
+      "options": [
+        "1757",
+        "1764",
+        "1857",
+        "1707"
+      ],
+      "correctAnswer": "1757",
+      "explanation": "The Battle of Plassey was fought on 23 June 1757 near Palashi in Bengal, where Robert Clive defeated Siraj-ud-Daulah through the betrayal of Mir Jafar.",
+      "misconceptions": {
+        "1764": "1764 was the Battle of Buxar, whereas Plassey was fought in 1757."
+      }
+    },
+    {
+      "id": "col-7",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -1.3,
+      "subtopic": "De-industrialization & Drain of Wealth",
+      "text": "Who authored the famous 1901 book 'Poverty and Un-British Rule in India', exposing the drain of wealth from India to Britain?",
+      "options": [
+        "Dadabhai Naoroji",
+        "Romesh Chandra Dutt",
+        "Gopal Krishna Gokhale",
+        "Bal Gangadhar Tilak"
+      ],
+      "correctAnswer": "Dadabhai Naoroji",
+      "explanation": "Dadabhai Naoroji formulated the 'Drain of Wealth' theory in his 1901 book 'Poverty and Un-British Rule in India', estimating that £200-300 million was drained annually.",
+      "misconceptions": {
+        "Romesh Chandra Dutt": "R.C. Dutt authored 'The Economic History of India'; Dadabhai Naoroji wrote 'Poverty and Un-British Rule in India'."
+      }
+    },
+    {
+      "id": "col-8",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -1.2,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "Which sepoy of the 34th Bengal Native Infantry attacked British officers at Barrackpore on 29 March 1857, triggering events leading to the Great Rebellion?",
+      "options": [
+        "Mangal Pandey",
+        "Bakht Khan",
+        "Tantia Tope",
+        "Kunwar Singh"
+      ],
+      "correctAnswer": "Mangal Pandey",
+      "explanation": "On 29 March 1857, sepoy Mangal Pandey revolted against British officers at Barrackpore and refused the new Enfield rifle greased cartridges.",
+      "misconceptions": {
+        "Bakht Khan": "General Bakht Khan was a commander in Delhi during the 1857 rebellion, while Mangal Pandey sparked the revolt at Barrackpore."
+      }
+    },
+    {
+      "id": "col-9",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -0.9,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "What was the 'Cartaz' system enforced by the Portuguese along the Indian coast during the 16th century?",
+      "options": [
+        "A compulsory naval trade pass that merchant ships had to purchase to avoid capture or attack",
+        "A fixed land tax levied on coastal rice cultivators",
+        "A diplomatic treaty allowing Indian merchants free access to Lisbon",
+        "A silver coin minted by the Portuguese Viceroy in Goa"
+      ],
+      "correctAnswer": "A compulsory naval trade pass that merchant ships had to purchase to avoid capture or attack",
+      "explanation": "The Cartaz was a naval passport/permit issued by the Portuguese. Any vessel navigating Indian waters without purchasing a Cartaz was liable to be seized, confiscated, or sunk.",
+      "misconceptions": {
+        "A fixed land tax levied on coastal rice cultivators": "The Cartaz was strictly a maritime permit for sea navigation, not a land tax."
+      }
+    },
+    {
+      "id": "col-10",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -0.8,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "Which military strategy was pioneered by French Governor-General Joseph François Dupleix and later widely adopted by the British East India Company?",
+      "options": [
+        "Recruiting and disciplining Indian soldiers (sepoys) in European tactics and intervening in local dynastic succession disputes",
+        "Completely disbanding naval forces to focus solely on inland trade",
+        "Enforcing strict religious conversions on all local inhabitants",
+        "Refusing all political alliances with regional Indian rulers"
+      ],
+      "correctAnswer": "Recruiting and disciplining Indian soldiers (sepoys) in European tactics and intervening in local dynastic succession disputes",
+      "explanation": "Dupleix realized that European-trained Indian sepoys with modern firearms were formidable and that backing puppet rulers in succession disputes gave Europeans indirect control over large kingdoms.",
+      "misconceptions": {
+        "Refusing all political alliances with regional Indian rulers": "Dupleix's entire strategy rested on making alliances with rival Indian princes and placing puppets on thrones."
+      }
+    },
+    {
+      "id": "col-11",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -0.6,
+      "subtopic": "British Expansion & Annexation Policies",
+      "text": "Under Lord Dalhousie's 'Doctrine of Lapse', what happened if an Indian ruler died without a natural biological male heir?",
+      "options": [
+        "The kingdom lapsed to the British East India Company, and adopted sons could not inherit the throne",
+        "The kingdom was divided equally among all female relatives",
+        "The British East India Company appointed a regency council from the local village elders",
+        "The state was placed on auction to the highest bidder among European trading companies"
+      ],
+      "correctAnswer": "The kingdom lapsed to the British East India Company, and adopted sons could not inherit the throne",
+      "explanation": "The Doctrine of Lapse denied adopted heirs the right to succeed to the throne, leading to the annexation of states like Satara, Sambalpur, Udaipur, Nagpur, and Jhansi.",
+      "misconceptions": {
+        "The kingdom was divided equally among all female relatives": "Dalhousie explicitly denied inheritance rights to the state sovereignty and annexed the territory directly."
+      }
+    },
+    {
+      "id": "col-12",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -0.4,
+      "subtopic": "De-industrialization & Drain of Wealth",
+      "text": "How did British colonial tariff policies in the 18th and 19th centuries cause the collapse of India's world-famous textile industry?",
+      "options": [
+        "By imposing heavy import duties on Indian textiles entering Britain while allowing British factory-made cloth to enter India duty-free",
+        "By completely banning the cultivation of raw cotton across the Indian subcontinent",
+        "By granting huge subsidies to traditional Indian weavers in Dhaka and Surat",
+        "By requiring all Indian textiles to be purchased solely by China"
+      ],
+      "correctAnswer": "By imposing heavy import duties on Indian textiles entering Britain while allowing British factory-made cloth to enter India duty-free",
+      "explanation": "British authorities imposed prohibitive tariffs (up to 70-80%) on Indian handloom textiles entering Britain, while flooding Indian markets with machine-made British textiles with little or no tariffs (one-way free trade).",
+      "misconceptions": {
+        "By completely banning the cultivation of raw cotton across the Indian subcontinent": "The British actively encouraged raw cotton farming to supply Lancashire mills, but destroyed Indian processing and weaving."
+      }
+    },
+    {
+      "id": "col-13",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -0.2,
+      "subtopic": "Colonial Famines & Laissez-Faire Dogma",
+      "text": "During the Great Bengal Famine of 1770 in which 10 million people died, what was the response of the East India Company administration?",
+      "options": [
+        "They raised agricultural tax demands from 10% to 50% and strictly collected revenue regardless of crop failure",
+        "They opened free government soup kitchens and waived land revenue for five years",
+        "They imported emergency grain shipments from England to distribute in rural districts",
+        "They abolished all land taxes across Bengal, Bihar, and Odisha"
+      ],
+      "correctAnswer": "They raised agricultural tax demands from 10% to 50% and strictly collected revenue regardless of crop failure",
+      "explanation": "Despite severe drought in 1769, the Company forced the Nawab to raise taxes on produce from 10% to 50% and ruthlessly collected revenue, worsening starvation and causing 10 million deaths.",
+      "misconceptions": {
+        "They opened free government soup kitchens and waived land revenue for five years": "The Company refused tax remissions and prioritized wealth extraction over famine relief."
+      }
+    },
+    {
+      "id": "col-14",
+      "topicId": "colonial-era-in-india",
+      "difficulty": -0.1,
+      "subtopic": "Transformation of Governance & Education",
+      "text": "What was Thomas Babington Macaulay's primary argument in his famous 'Minute on Indian Education' of 1835?",
+      "options": [
+        "He claimed Western education in English was far superior, famously stating that a single shelf of a good European library was worth the whole native literature of India and Arabia",
+        "He advocated that Sanskrit and Persian should remain the sole media of higher instruction in India",
+        "He recommended reviving traditional village pathshalas across all districts",
+        "He urged that mathematics and science should only be taught in local mother tongues"
+      ],
+      "correctAnswer": "He claimed Western education in English was far superior, famously stating that a single shelf of a good European library was worth the whole native literature of India and Arabia",
+      "explanation": "Macaulay's Minute of 1835 dismissed Indian knowledge as 'useless' and 'inferior' and urged the British administration to promote English education to create a class of English-educated clerks.",
+      "misconceptions": {
+        "He advocated that Sanskrit and Persian should remain the sole media of higher instruction in India": "This was the Orientalist position, which Macaulay vehemently attacked and defeated."
+      }
+    },
+    {
+      "id": "col-15",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 0,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "Which early organized anti-colonial resistance in late 18th-century Bengal involved Hindu and Muslim ascetics and later inspired Bankim Chandra Chattopadhyay's novel 'Anandamath'?",
+      "options": [
+        "The Sannyasi-Fakir Rebellion",
+        "The Kol Uprising",
+        "The Santhal Rebellion",
+        "The Indigo Revolt"
+      ],
+      "correctAnswer": "The Sannyasi-Fakir Rebellion",
+      "explanation": "The Sannyasi-Fakir Rebellion broke out after the 1770 famine when the British restricted ascetics' traditional travel and imposed harsh land revenue. It inspired 'Anandamath' and the national song 'Vande Mataram'.",
+      "misconceptions": {
+        "The Santhal Rebellion": "The Santhal Rebellion was led by Sidhu and Kanhu in 1855-56 in Jharkhand/Bihar, not the late 18th-century ascetic revolt."
+      }
+    },
+    {
+      "id": "col-16",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 0.1,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "What was the immediate cause that sparked the Great Rebellion of 1857 among Indian sepoys?",
+      "options": [
+        "The introduction of new Enfield rifle cartridges greased with cow and pig fat, which sepoys had to bite open",
+        "A sudden reduction in the monthly pay of cavalry troopers in Meerut",
+        "The British ban on the recruitment of Rajput and Gurkha soldiers",
+        "The cancellation of all railway construction projects across North India"
+      ],
+      "correctAnswer": "The introduction of new Enfield rifle cartridges greased with cow and pig fat, which sepoys had to bite open",
+      "explanation": "The 1856 Enfield rifle cartridges were greased with animal fat (cow fat offended Hindus, and pig fat offended Muslims). Since soldiers had to bite the cartridges open, sepoys viewed it as a deliberate assault on their faith.",
+      "misconceptions": {
+        "A sudden reduction in the monthly pay of cavalry troopers in Meerut": "While low pay was a chronic complaint, the greased cartridges were the immediate explosive catalyst in 1857."
+      }
+    },
+    {
+      "id": "col-17",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 0.4,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "Why does the 1741 Battle of Colachel hold unique historical significance in the history of European colonial expansion in Asia?",
+      "options": [
+        "It was one of the earliest instances where an Asian sovereign power decisively defeated a European colonial military force on Indian soil",
+        "It resulted in the permanent annexation of the Netherlands by the Kingdom of Travancore",
+        "It marked the signing of the first reciprocal naval defense treaty between India and England",
+        "It completely halted all British East India Company operations in Bengal"
+      ],
+      "correctAnswer": "It was one of the earliest instances where an Asian sovereign power decisively defeated a European colonial military force on Indian soil",
+      "explanation": "King Marthanda Varma's victory over the Dutch fleet at Colachel (1741) shattered the myth of European military invincibility in India and permanently terminated the Dutch VOC's political ambitions on the subcontinent.",
+      "misconceptions": {
+        "It completely halted all British East India Company operations in Bengal": "Colachel was fought between Travancore and the Dutch in southern Kerala, unrelated to British operations in Bengal."
+      }
+    },
+    {
+      "id": "col-18",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 0.6,
+      "subtopic": "British Expansion & Annexation Policies",
+      "text": "Under the Subsidiary Alliance system formulated by Lord Wellesley (1798), how did the appointment of a 'British Resident' inside the court of an allied ruler curtail Indian sovereignty?",
+      "options": [
+        "The Resident acted as a powerful political watchdog who routinely interfered in internal administration, succession, and state appointments",
+        "The Resident was limited solely to collecting maritime port customs without entering the palace",
+        "The Resident served as an impartial judge appointed by the local panchayat",
+        "The Resident commanded French mercenary forces hired to defend the ruler's treasury"
+      ],
+      "correctAnswer": "The Resident acted as a powerful political watchdog who routinely interfered in internal administration, succession, and state appointments",
+      "explanation": "Although the Subsidiary Alliance claimed non-interference in internal affairs, the Resident resided permanently at court and exercised de facto control over state appointments, policy, and succession.",
+      "misconceptions": {
+        "The Resident was limited solely to collecting maritime port customs without entering the palace": "The Resident was stationed directly at the princely court and exerted profound political influence."
+      }
+    },
+    {
+      "id": "col-19",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 0.8,
+      "subtopic": "De-industrialization & Drain of Wealth",
+      "text": "What major transformation occurred in India's global economic standing over the 200 years of British colonial exploitation?",
+      "options": [
+        "India's share of world GDP collapsed from over 25% to just around 5% by the time of independence in 1947",
+        "India became the world's leading exporter of finished industrial machinery",
+        "India's agricultural sector transitioned to 100% mechanized collective farming",
+        "India's share of global trade expanded from 5% to 40% under British rule"
+      ],
+      "correctAnswer": "India's share of world GDP collapsed from over 25% to just around 5% by the time of independence in 1947",
+      "explanation": "Before British conquest, India produced roughly a quarter of world manufacturing output. Colonial policies of de-industrialization and raw material extraction reduced India's global GDP share to ~5% by 1947.",
+      "misconceptions": {
+        "India's share of global trade expanded from 5% to 40% under British rule": "Colonial rule impoverished India; its share of world trade and manufacturing drastically plummeted."
+      }
+    },
+    {
+      "id": "col-20",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 0.9,
+      "subtopic": "Colonial Famines & Laissez-Faire Dogma",
+      "text": "Why did the British adherence to 'Laissez-Faire' (free-market) economics intensify famine mortality in late 19th-century India?",
+      "options": [
+        "Administrators refused to interfere with market prices or restrict grain exports, allowing 1 million tonnes of rice to be exported annually even while millions starved",
+        "Administrators prohibited private merchants from buying or selling grain anywhere in India",
+        "The colonial government fixed bread prices so low that farmers stopped harvesting crops",
+        "The colonial government forced all railway trains to carry passengers rather than grain"
+      ],
+      "correctAnswer": "Administrators refused to interfere with market prices or restrict grain exports, allowing 1 million tonnes of rice to be exported annually even while millions starved",
+      "explanation": "Laissez-faire dogma held that government should not intervene in markets. Viceroys like Lord Lytton refused price controls and allowed grain to be exported to Britain for profit while millions perished.",
+      "misconceptions": {
+        "Administrators prohibited private merchants from buying or selling grain anywhere in India": "On the contrary, the British gave completely free rein to private merchants and grain speculators."
+      }
+    },
+    {
+      "id": "col-21",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.1,
+      "subtopic": "Transformation of Governance & Education",
+      "text": "In the 1830s, British Governor-General Charles Metcalfe praised traditional Indian village communities as 'Little Republics'. Why did the British nevertheless dismantle them?",
+      "options": [
+        "To replace autonomous community-based decision-making with a centralized administrative machinery focused on rigid tax collection and law enforcement",
+        "To convert all village councils into municipal corporations with voting rights for women",
+        "Because village councils refused to cultivate food grains and grew only flowers",
+        "Because village councils had officially allied with the French Republic in Paris"
+      ],
+      "correctAnswer": "To replace autonomous community-based decision-making with a centralized administrative machinery focused on rigid tax collection and law enforcement",
+      "explanation": "Traditional village councils were largely self-sufficient 'little republics'. The British dismantled local community self-governance in favor of centralized revenue collection and police control.",
+      "misconceptions": {
+        "To convert all village councils into municipal corporations with voting rights for women": "British colonial rule curtailed local democratic consensus and instituted top-down bureaucratic control."
+      }
+    },
+    {
+      "id": "col-22",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.2,
+      "subtopic": "Transformation of Governance & Education",
+      "text": "What fundamental pedagogical critique did Mahatma Gandhi raise against the colonial English education system through his 'Nai Talim' (Basic Education) proposal in the 1930s?",
+      "options": [
+        "He argued colonial education was bookish, alienating, and disconnected from real life, advocating instead for hands-on crafts (spinning, farming) taught in the mother tongue",
+        "He demanded that all Indian students be sent to London for compulsory university degrees",
+        "He argued that all physical activity and craft work should be eliminated from the school syllabus",
+        "He demanded that Latin and Greek replace English as the medium of examination"
+      ],
+      "correctAnswer": "He argued colonial education was bookish, alienating, and disconnected from real life, advocating instead for hands-on crafts (spinning, farming) taught in the mother tongue",
+      "explanation": "Gandhi's 'Nai Talim' (1937) stressed education of head, heart, and hand through productive crafts and the mother tongue, rejecting Macaulay's bookish, colonial, clerk-producing system.",
+      "misconceptions": {
+        "He demanded that all physical activity and craft work should be eliminated from the school syllabus": "Gandhi believed productive manual work was the very center of true character-building education."
+      }
+    },
+    {
+      "id": "col-23",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.3,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "What major grievance drove the Santhal Rebellion (1855–1856) led by brothers Sidhu and Kanhu in the Rajmahal hills?",
+      "options": [
+        "British land policies that transferred tribal lands to non-Santhal zamindars and moneylenders, reducing Santhals to indebted tenant laborers",
+        "The introduction of compulsory military conscription for Santhal youth in the Royal Navy",
+        "A British ban on the construction of bamboo dwellings in forest clearings",
+        "The refusal of British merchants to purchase Santhal honey at London commodity exchanges"
+      ],
+      "correctAnswer": "British land policies that transferred tribal lands to non-Santhal zamindars and moneylenders, reducing Santhals to indebted tenant laborers",
+      "explanation": "The Permanent Settlement and colonial laws displaced Santhals from their ancestral lands in Damin-i-koh, subjecting them to extortionate moneylenders (dikus) and corrupt police, sparking the 1855 revolt.",
+      "misconceptions": {
+        "The introduction of compulsory military conscription for Santhal youth in the Royal Navy": "The rebellion was rooted in land alienation, debt bondage, and police extortion, not naval conscription."
+      }
+    },
+    {
+      "id": "col-24",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.4,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "Which playwright wrote the historic Bengali play 'Nil Darpan' (1860), exposing the brutal coercion and torture of indigo farmers by European planters during the Blue Rebellion?",
+      "options": [
+        "Dinabandhu Mitra",
+        "Bankim Chandra Chattopadhyay",
+        "Rabindranath Tagore",
+        "Michael Madhusudan Dutt"
+      ],
+      "correctAnswer": "Dinabandhu Mitra",
+      "explanation": "Dinabandhu Mitra's play 'Nil Darpan' (The Mirror of Indigo) vividly depicted the suffering of indigo ryots, creating widespread public sympathy and prompting the British government to appoint the Indigo Commission.",
+      "misconceptions": {
+        "Bankim Chandra Chattopadhyay": "Bankim Chandra wrote 'Anandamath' (about the Sannyasi rebellion); Dinabandhu Mitra wrote 'Nil Darpan'."
+      }
+    },
+    {
+      "id": "col-25",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.6,
+      "subtopic": "European Rivalry & Maritime Resistance",
+      "text": "Assertion (A): The Portuguese Cartaz system was fundamentally an armed protection racket rather than a standard commercial customs duty.\nReason (R): The Portuguese did not provide reciprocal maritime security; they claimed sovereign ownership of the ocean and seized any Asian vessel that failed to pay for their pass.",
+      "options": [
+        "Both (A) and (R) are true, and (R) is the correct explanation of (A)",
+        "Both (A) and (R) are true, but (R) is NOT the correct explanation of (A)",
+        "(A) is true, but (R) is false",
+        "(A) is false, but (R) is true"
+      ],
+      "correctAnswer": "Both (A) and (R) are true, and (R) is the correct explanation of (A)",
+      "explanation": "The Portuguese Estado da Índia unilaterally claimed mare clausum (closed sea) over the Indian Ocean. The Cartaz was an extortionate pass: failure to purchase it meant instant attack and confiscation by Portuguese warships.",
+      "misconceptions": {
+        "Both (A) and (R) are true, but (R) is NOT the correct explanation of (A)": "The absence of reciprocal protection and unilateral threat of force is precisely what defines a protection racket."
+      }
+    },
+    {
+      "id": "col-26",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.7,
+      "subtopic": "British Expansion & Annexation Policies",
+      "text": "Assertion (A): The Battle of Plassey (1757) marked the transition of the British East India Company from commercial traders into territorial rulers.\nReason (R): Robert Clive was awarded the formal Diwani of Bengal immediately on the battlefield of Plassey in 1757 by the Mughal Emperor.",
+      "options": [
+        "(A) is true, but (R) is false",
+        "Both (A) and (R) are true, and (R) is the correct explanation of (A)",
+        "Both (A) and (R) are true, but (R) is NOT the correct explanation of (A)",
+        "(A) is false, but (R) is true"
+      ],
+      "correctAnswer": "(A) is true, but (R) is false",
+      "explanation": "Assertion (A) is true: Plassey gave the British political control of Bengal. But Reason (R) is false: Diwani was granted in 1765 after the Battle of Buxar (1764), not on the field of Plassey in 1757.",
+      "misconceptions": {
+        "Both (A) and (R) are true, and (R) is the correct explanation of (A)": "Diwani was granted 8 years later in 1765 by Shah Alam II following Buxar, not at Plassey."
+      }
+    },
+    {
+      "id": "col-27",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.8,
+      "subtopic": "De-industrialization & Drain of Wealth",
+      "text": "Economist Utsa Patnaik calculated that Britain drained ~$45 trillion USD from India between 1765 and 1938. What was the central accounting mechanism of this fiscal transfer?",
+      "options": [
+        "Indian tax revenues collected by the Company and Crown were diverted to purchase Indian export goods, allowing Britain to obtain commodities for free and re-export them globally for 100% foreign exchange profit",
+        "The British government paid Indian farmers five times the global price in British pounds for all agricultural output",
+        "Gold bullion was mined in South Africa and deposited into the private accounts of Indian princely rulers",
+        "Indian taxpayers were directly reimbursed by the Bank of England with interest upon retirement"
+      ],
+      "correctAnswer": "Indian tax revenues collected by the Company and Crown were diverted to purchase Indian export goods, allowing Britain to obtain commodities for free and re-export them globally for 100% foreign exchange profit",
+      "explanation": "Britain used a portion of Indian tax revenues (Council Bills) to pay Indian producers for exports. Thus, Britain received goods free of cost and re-exported them worldwide, financing its own capital expansion while impoverishing India.",
+      "misconceptions": {
+        "The British government paid Indian farmers five times the global price in British pounds for all agricultural output": "Farmers received depressed prices in rupees paid out of their own country's taxes, not generous British pounds."
+      }
+    },
+    {
+      "id": "col-28",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 1.9,
+      "subtopic": "Transformation of Governance & Education",
+      "text": "Consider the dispute between 'Orientalists' and 'Anglicists' in 19th-century colonial India:\n1. Orientalists like William Jones advocated teaching through Sanskrit, Persian, and Arabic to understand traditional laws and cultures.\n2. Anglicists like Macaulay argued that spending public funds on Oriental learning was wasteful and that all state funding should support English-medium Western education.\nWhich of the statements is/are correct?",
+      "options": [
+        "Both 1 and 2",
+        "1 only",
+        "2 only",
+        "Neither 1 nor 2"
+      ],
+      "correctAnswer": "Both 1 and 2",
+      "explanation": "Both statements are correct. The Orientalists believed in classical vernacular learning to preserve Indian traditions, whereas Macaulay and the Anglicists triumphed in 1835 by directing all government educational funds exclusively to English-medium institutions.",
+      "misconceptions": {
+        "1 only": "Statement 2 is also completely true: Macaulay's Minute successfully ended state funding for Orientalist colleges."
+      }
+    },
+    {
+      "id": "col-29",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 2,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "Assertion (A): The British government passed the Government of India Act 1858 dissolving the East India Company and transferring rule to the British Crown.\nReason (R): The Great Rebellion of 1857 revealed that a commercial joint-stock company could no longer securely govern an empire and maintain military stability.",
+      "options": [
+        "Both (A) and (R) are true, and (R) is the correct explanation of (A)",
+        "Both (A) and (R) are true, but (R) is NOT the correct explanation of (A)",
+        "(A) is true, but (R) is false",
+        "(A) is false, but (R) is true"
+      ],
+      "correctAnswer": "Both (A) and (R) are true, and (R) is the correct explanation of (A)",
+      "explanation": "The 1857 uprising proved that Company rule was unsustainable and fraught with administrative and military vulnerabilities. Parliament stepped in with the Act of 1858 to establish direct royal governance under Queen Victoria.",
+      "misconceptions": {
+        "Both (A) and (R) are true, but (R) is NOT the correct explanation of (A)": "The structural failure of Company administration shown by the revolt was the precise cause for the Crown takeover."
+      }
+    },
+    {
+      "id": "col-30",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 2.1,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "Which of the following was NOT a major cause for the military failure of the Great Rebellion of 1857 despite its widespread popular support?",
+      "options": [
+        "The rebels possessed advanced wireless telegraph networks that intercepted British military communications across all provinces",
+        "Lack of a centralized coordination command and common long-term national political ideology among rebel groups",
+        "Disunity among regional rulers, with many princely states actively supporting or remaining neutral toward the British",
+        "British access to superior military technology, modern Enfield rifles, and rapid transport via railways and electric telegraphs"
+      ],
+      "correctAnswer": "The rebels possessed advanced wireless telegraph networks that intercepted British military communications across all provinces",
+      "explanation": "The rebels did NOT have telegraphs or wireless communication; on the contrary, the British controlled the electric telegraph network and railways, allowing them to rapidly mobilize reinforcements.",
+      "misconceptions": {
+        "Lack of a centralized coordination command and common long-term national political ideology among rebel groups": "This was indeed a primary cause of rebel defeat noted in the textbook."
+      }
+    },
+    {
+      "id": "col-31",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 2.2,
+      "subtopic": "Rebellions, 1857 Uprising & Crown Rule",
+      "text": "Following the Revolt of 1857, what significant structural change did the British military introduce regarding the recruitment of Indian soldiers?",
+      "options": [
+        "They drastically reduced recruitment of soldiers from Awadh and Bihar, instead favoring 'martial races' like the Gurkhas, Sikhs, and Pathans who had remained loyal during the revolt",
+        "They mandated that all infantry regiments be commanded exclusively by Indian princes",
+        "They banned the use of firearms by Indian soldiers and equipped them only with swords",
+        "They recruited all sepoys exclusively from the Portuguese colony of Goa"
+      ],
+      "correctAnswer": "They drastically reduced recruitment of soldiers from Awadh and Bihar, instead favoring 'martial races' like the Gurkhas, Sikhs, and Pathans who had remained loyal during the revolt",
+      "explanation": "To prevent future uprisings, the British restructured the army (Peel Commission), drastically reducing high-caste sepoys from Bengal/Awadh and creating the 'martial race' theory favoring Gurkhas, Sikhs, and Punjabis.",
+      "misconceptions": {
+        "They mandated that all infantry regiments be commanded exclusively by Indian princes": "British officers maintained absolute commanding monopoly over all regiments and artillery."
+      }
+    },
+    {
+      "id": "col-32",
+      "topicId": "colonial-era-in-india",
+      "difficulty": 2.3,
+      "subtopic": "Transformation of Governance & Education",
+      "text": "In what way did the British colonial legal system introduce structural inequality across rural India despite professing the 'Rule of Law'?",
+      "options": [
+        "Legal proceedings were conducted in a foreign language (English), involved exorbitant court fees and lawyers, and prioritized rigid property deeds over traditional community usufruct rights, heavily favoring wealthy landlords and moneylenders over illiterate peasants",
+        "The British abolished all criminal courts and allowed village councils to execute convicted offenders",
+        "The legal system provided free legal counsel and guaranteed land ownership to all landless laborers",
+        "British judges were legally required to follow the dictates of the Peshwa of Pune in all civil disputes"
+      ],
+      "correctAnswer": "Legal proceedings were conducted in a foreign language (English), involved exorbitant court fees and lawyers, and prioritized rigid property deeds over traditional community usufruct rights, heavily favoring wealthy landlords and moneylenders over illiterate peasants",
+      "explanation": "The British judicial system replaced accessible, community-based consensus with complex, adversarial, expensive litigation in English. Poor peasants could not afford lawyers or written evidence, allowing moneylenders and zamindars to exploit legal loopholes and evict them from lands.",
+      "misconceptions": {
+        "The legal system provided free legal counsel and guaranteed land ownership to all landless laborers": "The system was inaccessible to the poor and systematically reinforced landlord and moneylender domination."
+      }
+    }
+  ]
+}
 ];
 
 export function getTopicById(id: string): ConceptTopic | undefined {

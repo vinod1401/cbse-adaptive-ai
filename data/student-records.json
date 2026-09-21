@@ -148,5 +148,28 @@
     "accuracyPct": 0,
     "lastActive": "Just registered",
     "flaggedMisconceptions": []
+  },
+  {
+    "id": "10_8-A_algebraic-identities",
+    "studentId": "std_1789919595747",
+    "studentName": "vinod",
+    "rollNo": "10",
+    "section": "8-A",
+    "topicId": "algebraic-identities",
+    "topicTitle": "Standard Algebraic Identities",
+    "theta": -2.96,
+    "masteryPct": 4,
+    "tier": {
+      "label": "Foundational",
+      "badge": "🔴 Foundation Required",
+      "color": "rose"
+    },
+    "questionsAttempted": 6,
+    "correctAnswers": 1,
+    "accuracyPct": 17,
+    "lastActive": "Just now",
+    "flaggedMisconceptions": [
+      "Squaring (x + 1/x) produces a +2 middle term: x^2 + 2*(x)*(1/x) + 1/x^2, so you must subtract 2 from 25."
+    ]
   }
 ]
