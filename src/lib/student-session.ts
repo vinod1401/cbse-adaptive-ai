@@ -24,6 +24,10 @@ export interface StudentPerformanceRecord {
   correctAnswers: number;
   accuracyPct: number;
   lastActive: string;
+  lastAttemptAt?: string; // e.g. "08:15 AM"
+  lastAttemptTimestamp?: number; // epoch ms
+  sessionDurationSeconds?: number;
+  sessionDurationFormatted?: string; // e.g. "12m 25s"
   flaggedMisconceptions: string[];
 }
 
@@ -105,7 +109,30 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 10,
     accuracyPct: 83,
     lastActive: "15 mins ago",
+    lastAttemptAt: "08:05 AM",
+    sessionDurationSeconds: 780,
+    sessionDurationFormatted: "13m 00s",
     flaggedMisconceptions: ["Inverting fraction in division occasionally"],
+  },
+  {
+    id: "08_8A_colonial-era-in-india",
+    studentId: "std_08",
+    studentName: "Aarav Sharma",
+    rollNo: "08",
+    section: "8-A",
+    topicId: "colonial-era-in-india",
+    topicTitle: "The Colonial Era in India & Economic Drain",
+    theta: 0.90,
+    masteryPct: 72,
+    tier: { label: "Proficient", badge: "🟡 Proficient" },
+    questionsAttempted: 9,
+    correctAnswers: 7,
+    accuracyPct: 78,
+    lastActive: "5 mins ago",
+    lastAttemptAt: "08:15 AM",
+    sessionDurationSeconds: 675,
+    sessionDurationFormatted: "11m 15s",
+    flaggedMisconceptions: [],
   },
   {
     id: "14_8B_linear-equations",
@@ -122,6 +149,9 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 4,
     accuracyPct: 40,
     lastActive: "45 mins ago",
+    lastAttemptAt: "07:35 AM",
+    sessionDurationSeconds: 620,
+    sessionDurationFormatted: "10m 20s",
     flaggedMisconceptions: ["Sign change error when transposing across equals sign"],
   },
   {
@@ -139,6 +169,9 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 11,
     accuracyPct: 73,
     lastActive: "1 hour ago",
+    lastAttemptAt: "07:20 AM",
+    sessionDurationSeconds: 940,
+    sessionDurationFormatted: "15m 40s",
     flaggedMisconceptions: ["Omits 2ab cross term in (a+b)^2 expansion"],
   },
   {
@@ -156,6 +189,9 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 13,
     accuracyPct: 93,
     lastActive: "2 hours ago",
+    lastAttemptAt: "06:15 AM",
+    sessionDurationSeconds: 860,
+    sessionDurationFormatted: "14m 20s",
     flaggedMisconceptions: [],
   },
   {
@@ -173,6 +209,9 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 2,
     accuracyPct: 25,
     lastActive: "Yesterday",
+    lastAttemptAt: "Yesterday, 04:30 PM",
+    sessionDurationSeconds: 490,
+    sessionDurationFormatted: "8m 10s",
     flaggedMisconceptions: ["Divides RHS instead of multiplying reciprocal", "Order of operations in multi-step brackets"],
   },
   {
@@ -190,7 +229,30 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 6,
     accuracyPct: 75,
     lastActive: "10 mins ago",
+    lastAttemptAt: "08:10 AM",
+    sessionDurationSeconds: 710,
+    sessionDurationFormatted: "11m 50s",
     flaggedMisconceptions: [],
+  },
+  {
+    id: "12_8-A_rational-numbers",
+    studentId: "std_12_8-A",
+    studentName: "Aadvik",
+    rollNo: "12",
+    section: "8-A",
+    topicId: "rational-numbers",
+    topicTitle: "Operations on Rational Numbers",
+    theta: 0.20,
+    masteryPct: 55,
+    tier: { label: "Proficient", badge: "🟡 Proficient" },
+    questionsAttempted: 6,
+    correctAnswers: 4,
+    accuracyPct: 67,
+    lastActive: "30 mins ago",
+    lastAttemptAt: "07:50 AM",
+    sessionDurationSeconds: 510,
+    sessionDurationFormatted: "8m 30s",
+    flaggedMisconceptions: ["Reciprocal error during fraction division"],
   },
   {
     id: "15_8-A_colonial-era-in-india",
@@ -207,6 +269,29 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 5,
     accuracyPct: 71,
     lastActive: "15 mins ago",
+    lastAttemptAt: "08:05 AM",
+    sessionDurationSeconds: 580,
+    sessionDurationFormatted: "9m 40s",
+    flaggedMisconceptions: [],
+  },
+  {
+    id: "15_8-A_crop-production",
+    studentId: "std_15_8-A",
+    studentName: "Parv",
+    rollNo: "15",
+    section: "8-A",
+    topicId: "crop-production",
+    topicTitle: "Crop Production & Agricultural Practices",
+    theta: 0.60,
+    masteryPct: 65,
+    tier: { label: "Proficient", badge: "🟡 Proficient" },
+    questionsAttempted: 8,
+    correctAnswers: 6,
+    accuracyPct: 75,
+    lastActive: "40 mins ago",
+    lastAttemptAt: "07:40 AM",
+    sessionDurationSeconds: 615,
+    sessionDurationFormatted: "10m 15s",
     flaggedMisconceptions: [],
   },
 ];

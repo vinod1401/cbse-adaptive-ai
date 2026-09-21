@@ -55,6 +55,10 @@ export async function syncStudentPerformance(payload: SyncStudentPayload): Promi
         topicId: payload.topicId,
         topicTitle: payload.topicTitle,
         misconceptions: payload.flaggedMisconceptions || [],
+        sessionDurationSeconds: payload.sessionDurationSeconds,
+        sessionDurationFormatted: payload.sessionDurationFormatted,
+        lastAttemptTimestamp: payload.lastAttemptTimestamp,
+        lastAttemptAt: payload.lastAttemptAt,
       }),
     });
 

@@ -15,7 +15,18 @@ import { StudentPerformanceRecord } from "@/lib/student-session";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { profile, signature, student, topicId, topicTitle, misconceptions = [] } = body;
+    const {
+      profile,
+      signature,
+      student,
+      topicId,
+      topicTitle,
+      misconceptions = [],
+      sessionDurationSeconds,
+      sessionDurationFormatted,
+      lastAttemptTimestamp,
+      lastAttemptAt,
+    } = body;
 
     if (!student || !topicId) {
       return NextResponse.json(
@@ -60,6 +71,38 @@ export async function POST(request: Request) {
     const totalCorr = irtProfile.correctCount || 0;
     const accuracy = totalAtt > 0 ? Math.round((totalCorr / totalAtt) * 100) : 0;
 
+    const nowTs = typeof lastAttemptTimestamp === "number" ? lastAttemptTimestamp : Date.now();
+    let computedTimeStr = lastAttemptAt;
+    if (!computedTimeStr) {
+      try {
+        computedTimeStr = new Intl.DateTimeFormat("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "Asia/Kolkata",
+        }).format(new Date(nowTs));
+      } catch {
+        const d = new Date(nowTs);
+        let hours = d.getHours();
+        const minutes = d.getMinutes();
+        const ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12 || 12;
+        computedTimeStr = `${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes} ${ampm}`;
+      }
+    }
+
+    const durationSec = typeof sessionDurationSeconds === "number" ? sessionDurationSeconds : 0;
+    let computedDurStr = sessionDurationFormatted;
+    if (!computedDurStr) {
+      if (durationSec <= 0) {
+        computedDurStr = "< 1 min";
+      } else {
+        const m = Math.floor(durationSec / 60);
+        const s = durationSec % 60;
+        computedDurStr = m === 0 ? `${s}s` : `${m}m ${s < 10 ? "0" : ""}${s}s`;
+      }
+    }
+
     // Authoritative record computed by the server from verified signature
     const record: StudentPerformanceRecord = {
       id: docId,
@@ -76,6 +119,10 @@ export async function POST(request: Request) {
       correctAnswers: totalCorr,
       accuracyPct: accuracy,
       lastActive: isInitialRegistration ? "Just registered" : "Just now",
+      lastAttemptAt: computedTimeStr,
+      lastAttemptTimestamp: nowTs,
+      sessionDurationSeconds: durationSec,
+      sessionDurationFormatted: computedDurStr,
       flaggedMisconceptions: Array.isArray(misconceptions) ? misconceptions.slice(0, 10) : [],
     };
 

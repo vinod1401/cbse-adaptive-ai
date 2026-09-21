@@ -95,6 +95,7 @@ function PracticeContent() {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<any>(null);
   const [startTime, setStartTime] = useState<number>(Date.now());
+  const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
   const [seenIds, setSeenIds] = useState<string[]>([]);
 
   const [aiTutorOpen, setAiTutorOpen] = useState(false);
@@ -273,10 +274,23 @@ function PracticeContent() {
     setShowProfileModal(false);
 
     // Reset local state when switching/registering student
+    setSessionStartTime(Date.now());
     setSelectedOption(null);
     setFeedback(null);
     setAiTutorOpen(false);
     setHintContent("");
+
+    let regTimeStr = "";
+    try {
+      regTimeStr = new Intl.DateTimeFormat("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Kolkata",
+      }).format(new Date());
+    } catch {
+      regTimeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
 
     // 1. Immediately register student in authoritative store and roster
     const docId = `${newProf.rollNo}_${newProf.section}_${topicId}`.replace(/\s+/g, "_");
@@ -295,6 +309,10 @@ function PracticeContent() {
       correctAnswers: 0,
       accuracyPct: 0,
       lastActive: "Just registered",
+      lastAttemptAt: regTimeStr,
+      lastAttemptTimestamp: Date.now(),
+      sessionDurationSeconds: 0,
+      sessionDurationFormatted: "< 1 min",
       flaggedMisconceptions: [],
     };
     syncStudentPerformance(regRecord).catch(() => {});
@@ -373,6 +391,28 @@ function PracticeContent() {
           const totalCorr = data.profile.history?.filter((h: any) => h.correct)?.length || (data.isCorrect ? 1 : 0);
           const recMisconceptions = data.misconception ? [data.misconception.label] : [];
 
+          const sessionDurationSeconds = Math.max(1, Math.round((Date.now() - sessionStartTime) / 1000));
+          const m = Math.floor(sessionDurationSeconds / 60);
+          const s = sessionDurationSeconds % 60;
+          const sessionDurationFormatted = m === 0 ? `${s}s` : `${m}m ${s < 10 ? "0" : ""}${s}s`;
+
+          let lastAttemptAt = "";
+          try {
+            lastAttemptAt = new Intl.DateTimeFormat("en-IN", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+              timeZone: "Asia/Kolkata",
+            }).format(new Date());
+          } catch {
+            const d = new Date();
+            let hours = d.getHours();
+            const minutes = d.getMinutes();
+            const ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
+            lastAttemptAt = `${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes} ${ampm}`;
+          }
+
           syncStudentPerformance({
             id: `${std.rollNo}_${std.section}_${topicId}`.replace(/\s+/g, "_"),
             studentId: std.id,
@@ -388,6 +428,10 @@ function PracticeContent() {
             correctAnswers: totalCorr,
             accuracyPct: Math.round((totalCorr / totalAtt) * 100),
             lastActive: "Just now",
+            lastAttemptAt,
+            lastAttemptTimestamp: Date.now(),
+            sessionDurationSeconds,
+            sessionDurationFormatted,
             flaggedMisconceptions: recMisconceptions,
             profile: data.profile,
             signature: data.signature,

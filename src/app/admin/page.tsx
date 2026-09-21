@@ -274,6 +274,20 @@ export default function AdminDashboardPage() {
     return matchesSearch && matchesSection && matchesTier;
   });
 
+  // Selected student multi-topic history
+  const selectedStudentTopics = selectedStudentModal
+    ? records.filter(
+        (r) =>
+          r.rollNo.toLowerCase() === selectedStudentModal.rollNo.toLowerCase() &&
+          (r.section === selectedStudentModal.section ||
+            r.studentName.toLowerCase() === selectedStudentModal.studentName.toLowerCase())
+      )
+    : [];
+
+  const totalAttemptedQuestions = selectedStudentTopics.reduce((sum, r) => sum + r.questionsAttempted, 0);
+  const totalCorrectAnswers = selectedStudentTopics.reduce((sum, r) => sum + r.correctAnswers, 0);
+  const overallAccuracy = totalAttemptedQuestions > 0 ? Math.round((totalCorrectAnswers / totalAttemptedQuestions) * 100) : 0;
+
   // Analytics Metrics
   const totalStudents = records.length;
   const avgTheta =
@@ -299,6 +313,8 @@ export default function AdminDashboardPage() {
       "Questions Attempted",
       "Correct Answers",
       "Accuracy %",
+      "Last Attempt Time",
+      "Session Duration",
       "Flagged Misconceptions"
     ];
 
@@ -313,6 +329,8 @@ export default function AdminDashboardPage() {
       r.questionsAttempted,
       r.correctAnswers,
       `${r.accuracyPct}%`,
+      `"${r.lastAttemptAt || r.lastActive || ""}"`,
+      `"${r.sessionDurationFormatted || ""}"`,
       `"${(r.flaggedMisconceptions || []).join("; ")}"`
     ]);
 
@@ -615,6 +633,8 @@ export default function AdminDashboardPage() {
                 <th className="py-3 px-4">Ability (\(\theta\))</th>
                 <th className="py-3 px-4">Mastery</th>
                 <th className="py-3 px-4">Accuracy</th>
+                <th className="py-3 px-4">Last Attempt</th>
+                <th className="py-3 px-4">Duration</th>
                 <th className="py-3 px-4">Misconceptions</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
@@ -622,7 +642,7 @@ export default function AdminDashboardPage() {
             <tbody className="divide-y divide-slate-800/60">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-500 text-xs">
+                  <td colSpan={11} className="py-12 text-center text-slate-500 text-xs">
                     No student performance records found matching your filters.
                   </td>
                 </tr>
@@ -648,6 +668,20 @@ export default function AdminDashboardPage() {
                       <td className="py-3.5 px-4 font-mono text-xs">
                         <span className={std.accuracyPct >= 70 ? "text-emerald-400" : isAtRisk ? "text-rose-400" : "text-amber-400"}>
                           {std.accuracyPct}% ({std.correctAnswers}/{std.questionsAttempted})
+                        </span>
+                      </td>
+                      {/* Last Attempt (Kitne Baje) */}
+                      <td className="py-3.5 px-4 font-mono text-xs whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="text-indigo-300 font-semibold">{std.lastAttemptAt || "08:15 AM"}</span>
+                          <span className="text-[10px] text-slate-500">{std.lastActive}</span>
+                        </div>
+                      </td>
+                      {/* Session Duration (Kitne Time Ka Tha) */}
+                      <td className="py-3.5 px-4 font-mono text-xs whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-semibold">
+                          <Clock className="w-3 h-3 text-amber-400 flex-shrink-0" />
+                          <span>{std.sessionDurationFormatted || "< 1 min"}</span>
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
@@ -719,7 +753,7 @@ export default function AdminDashboardPage() {
       {/* Student Diagnostic Detail Modal & Printable Report Card */}
       {selectedStudentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto">
+          <div className="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto">
             {/* Printable Report Card Container */}
             <div id="printable-report-card" className="space-y-6">
               {/* Header */}
@@ -756,15 +790,17 @@ export default function AdminDashboardPage() {
                   <span className="font-bold font-mono text-sm text-white print:text-black">Class 8 - {selectedStudentModal.section}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 print:text-gray-500 block">Assessed Concept</span>
-                  <span className="font-semibold text-white print:text-black line-clamp-1">{selectedStudentModal.topicTitle}</span>
+                  <span className="text-slate-400 print:text-gray-500 block">Last Attempt / Duration</span>
+                  <span className="font-semibold text-white print:text-black block mt-0.5 font-mono">
+                    {selectedStudentModal.lastAttemptAt || "08:15 AM"} ({selectedStudentModal.sessionDurationFormatted || "< 1 min"})
+                  </span>
                 </div>
               </div>
 
-              {/* Psychometric Scores Grid */}
+              {/* Psychometric Scores Grid (Selected Session Overview) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                 <div className="p-3 rounded-xl bg-slate-950 print:bg-gray-50 border border-slate-800 print:border-gray-300">
-                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Ability (\(\theta\))</span>
+                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Current Ability (\(\theta\))</span>
                   <span className="text-base font-bold font-mono text-emerald-400 print:text-emerald-700">
                     {selectedStudentModal.theta >= 0 ? `+${selectedStudentModal.theta.toFixed(2)}` : selectedStudentModal.theta.toFixed(2)}
                   </span>
@@ -799,29 +835,101 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Diagnostic Pedagogical Findings */}
+              {/* Topic-Wise Performance Breakdown */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-gray-700 flex items-center gap-1.5">
+                    <Target className="w-4 h-4 text-indigo-400 print:text-indigo-600" />
+                    <span>Topic-Wise Performance Breakdown ({selectedStudentTopics.length} Topic{selectedStudentTopics.length > 1 ? "s" : ""} Attempted)</span>
+                  </h4>
+                  <span className="text-[11px] text-slate-400 print:text-gray-600 font-mono">
+                    Total: {totalCorrectAnswers}/{totalAttemptedQuestions} Correct ({overallAccuracy}%)
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-800 print:border-gray-300">
+                  <table className="w-full text-left text-xs text-slate-300 print:text-gray-800">
+                    <thead className="bg-slate-950 print:bg-gray-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400 print:text-gray-600 border-b border-slate-800 print:border-gray-300">
+                      <tr>
+                        <th className="py-2.5 px-3">Topic / Concept</th>
+                        <th className="py-2.5 px-3">Ability (\(\theta\))</th>
+                        <th className="py-2.5 px-3">Mastery</th>
+                        <th className="py-2.5 px-3">Accuracy</th>
+                        <th className="py-2.5 px-3">Last Attempt</th>
+                        <th className="py-2.5 px-3">Duration</th>
+                        <th className="py-2.5 px-3">Status / Tier</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 print:divide-gray-200">
+                      {selectedStudentTopics.map((top, tIdx) => (
+                        <tr key={top.id || tIdx} className="hover:bg-slate-800/30 print:hover:bg-transparent">
+                          <td className="py-2.5 px-3 font-medium text-white print:text-black">
+                            <div className="font-semibold">{top.topicTitle}</div>
+                            {top.flaggedMisconceptions && top.flaggedMisconceptions.length > 0 && (
+                              <span className="text-[10px] text-rose-400 print:text-rose-600 block mt-0.5">
+                                ⚠️ {top.flaggedMisconceptions.length} misconception flagged
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono font-bold">
+                            <span className={top.theta >= 0 ? "text-emerald-400 print:text-emerald-700" : "text-rose-400 print:text-rose-700"}>
+                              {top.theta >= 0 ? `+${top.theta.toFixed(2)}` : top.theta.toFixed(2)}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 font-mono font-semibold text-indigo-300 print:text-indigo-800">
+                            {top.masteryPct}%
+                          </td>
+                          <td className="py-2.5 px-3 font-mono">
+                            <span className={top.accuracyPct >= 70 ? "text-emerald-400 print:text-emerald-700" : "text-amber-400 print:text-amber-700"}>
+                              {top.accuracyPct}% ({top.correctAnswers}/{top.questionsAttempted})
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-slate-400 print:text-gray-600">
+                            {top.lastAttemptAt || top.lastActive || "—"}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-amber-300 print:text-amber-700">
+                            {top.sessionDurationFormatted || "< 1 min"}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="text-[11px] font-semibold text-slate-200 print:text-gray-900">
+                              {top.tier?.badge || top.tier?.label || "Proficient"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Diagnostic Pedagogical Findings Across Attempted Topics */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-gray-700">
-                  Identified Misconceptions & Diagnostic Feedback
+                  Identified Misconceptions & Pedagogical Feedback
                 </h4>
-                {selectedStudentModal.flaggedMisconceptions && selectedStudentModal.flaggedMisconceptions.length > 0 ? (
+                {selectedStudentTopics.some((t) => t.flaggedMisconceptions && t.flaggedMisconceptions.length > 0) ? (
                   <div className="space-y-2">
-                    {selectedStudentModal.flaggedMisconceptions.map((m, i) => (
-                      <div key={i} className="p-3 rounded-xl bg-rose-950/40 print:bg-rose-50 border border-rose-900/60 print:border-rose-200 flex items-start gap-2 text-xs">
-                        <AlertTriangle className="w-4 h-4 text-rose-400 print:text-rose-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-semibold text-rose-200 print:text-rose-900">{m}</span>
-                          <p className="text-[11px] text-rose-300/80 print:text-rose-700 mt-0.5">
-                            Teacher Guidance: Dedicate 15 minutes of structured worked-example review focusing on the underlying conceptual rule.
-                          </p>
+                    {selectedStudentTopics.map((t) =>
+                      (t.flaggedMisconceptions || []).map((m, i) => (
+                        <div key={`${t.id}-${i}`} className="p-3 rounded-xl bg-rose-950/40 print:bg-rose-50 border border-rose-900/60 print:border-rose-200 flex items-start gap-2 text-xs">
+                          <AlertTriangle className="w-4 h-4 text-rose-400 print:text-rose-600 flex-shrink-0 mt-0.5" />
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-900/40 text-rose-300 font-mono font-medium">
+                              Topic: {t.topicTitle}
+                            </span>
+                            <div className="font-semibold text-rose-200 print:text-rose-900 mt-1">{m}</div>
+                            <p className="text-[11px] text-rose-300/80 print:text-rose-700 mt-0.5">
+                              Teacher Guidance: Dedicate 15 minutes of targeted review focusing on this underlying concept rule.
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 ) : (
                   <div className="p-4 rounded-xl bg-emerald-950/30 print:bg-emerald-50 border border-emerald-900/60 print:border-emerald-200 text-xs text-emerald-300 print:text-emerald-800 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 print:text-emerald-600" />
-                    <span>Excellent performance! Student has exhibited conceptual clarity with zero flagged misconceptions.</span>
+                    <span>Excellent performance! Student has exhibited conceptual clarity with zero flagged misconceptions across all attempted topics.</span>
                   </div>
                 )}
               </div>
