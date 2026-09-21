@@ -54,7 +54,7 @@ function loadFromDisk() {
       const raw = fs.readFileSync(RECORDS_FILE, "utf8");
       const list = JSON.parse(raw);
       if (Array.isArray(list) && list.length > 0) {
-        const store = new Map<string, StudentPerformanceRecord>();
+        const store = globalThis.__pragatiStudentRecordsStore || new Map<string, StudentPerformanceRecord>();
         list.forEach((rec) => store.set(rec.id, rec));
         globalThis.__pragatiStudentRecordsStore = store;
       }
@@ -63,7 +63,9 @@ function loadFromDisk() {
       const raw = fs.readFileSync(DELETED_FILE, "utf8");
       const list = JSON.parse(raw);
       if (Array.isArray(list)) {
-        globalThis.__pragatiDeletedRecordIds = new Set<string>(list);
+        const delStore = globalThis.__pragatiDeletedRecordIds || new Set<string>();
+        list.forEach((d) => delStore.add(d));
+        globalThis.__pragatiDeletedRecordIds = delStore;
       }
     }
   } catch {}
@@ -194,6 +196,7 @@ export async function resetToBaselineRoster(): Promise<boolean> {
 }
 
 export async function getAllStudentRecords(): Promise<StudentPerformanceRecord[]> {
+  loadFromDisk();
   const store = getMemoryStore();
   const deletedSet = getDeletedStore();
   const map = new Map<string, StudentPerformanceRecord>();

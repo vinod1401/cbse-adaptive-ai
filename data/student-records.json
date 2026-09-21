@@ -171,5 +171,45 @@
     "flaggedMisconceptions": [
       "Squaring (x + 1/x) produces a +2 middle term: x^2 + 2*(x)*(1/x) + 1/x^2, so you must subtract 2 from 25."
     ]
+  },
+  {
+    "id": "12_8-A_colonial-era-in-india",
+    "studentId": "std_12_8-A",
+    "studentName": "Aadvik",
+    "rollNo": "12",
+    "section": "8-A",
+    "topicId": "colonial-era-in-india",
+    "topicTitle": "The Colonial Era in India & Economic Drain",
+    "theta": 0.45,
+    "masteryPct": 62,
+    "tier": {
+      "label": "Proficient",
+      "badge": "🟡 Proficient"
+    },
+    "questionsAttempted": 8,
+    "correctAnswers": 6,
+    "accuracyPct": 75,
+    "lastActive": "10 mins ago",
+    "flaggedMisconceptions": []
+  },
+  {
+    "id": "15_8-A_colonial-era-in-india",
+    "studentId": "std_15_8-A",
+    "studentName": "Parv",
+    "rollNo": "15",
+    "section": "8-A",
+    "topicId": "colonial-era-in-india",
+    "topicTitle": "The Colonial Era in India & Economic Drain",
+    "theta": 0.3,
+    "masteryPct": 58,
+    "tier": {
+      "label": "Proficient",
+      "badge": "🟡 Proficient"
+    },
+    "questionsAttempted": 7,
+    "correctAnswers": 5,
+    "accuracyPct": 71,
+    "lastActive": "15 mins ago",
+    "flaggedMisconceptions": []
   }
 ]

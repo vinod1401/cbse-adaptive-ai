@@ -214,13 +214,15 @@ function PracticeContent() {
     setFeedback(null);
 
     let localProfile = null;
-    try {
-      const saved = localStorage.getItem("pragati_profiles");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        localProfile = parsed[topicId] || null;
-      }
-    } catch (e) {}
+    if (!studentOverride) {
+      try {
+        const saved = localStorage.getItem("pragati_profiles");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          localProfile = parsed[topicId] || null;
+        }
+      } catch (e) {}
+    }
 
     const std = studentOverride || studentProfile || getSavedStudentProfile();
 
@@ -258,12 +260,6 @@ function PracticeContent() {
     e.preventDefault();
     if (!inputName.trim() || !inputRoll.trim()) return;
 
-    // Security: Lock student identity permanently once created to prevent overwriting other students' records
-    if (studentProfile) {
-      setShowProfileModal(false);
-      return;
-    }
-
     const newProf: StudentProfile = {
       id: "std_" + Date.now(),
       name: inputName.trim(),
@@ -275,6 +271,12 @@ function PracticeContent() {
     setStudentProfile(newProf);
     saveStudentProfile(newProf);
     setShowProfileModal(false);
+
+    // Reset local state when switching/registering student
+    setSelectedOption(null);
+    setFeedback(null);
+    setAiTutorOpen(false);
+    setHintContent("");
 
     // 1. Immediately register student in authoritative store and roster
     const docId = `${newProf.rollNo}_${newProf.section}_${topicId}`.replace(/\s+/g, "_");
@@ -563,9 +565,29 @@ function PracticeContent() {
             <span>Switch Topic</span>
           </button>
 
-          {!studentProfile && (
+          {studentProfile ? (
             <button
-              onClick={() => setShowProfileModal(true)}
+              onClick={() => {
+                setInputName(studentProfile.name);
+                setInputRoll(studentProfile.rollNo);
+                setInputSection(studentProfile.section);
+                setShowProfileModal(true);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors"
+              title="Click to switch student or edit identity"
+            >
+              <User className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="max-w-[110px] truncate">{studentProfile.name}</span>
+              <span className="text-[10px] text-indigo-400 underline font-normal ml-0.5">Switch</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setInputName("");
+                setInputRoll("");
+                setInputSection("8-A");
+                setShowProfileModal(true);
+              }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition-colors"
             >
               <User className="w-3.5 h-3.5" />
@@ -928,17 +950,29 @@ function PracticeContent() {
         </div>
       )}
 
-      {/* Student Profile Intake Modal (First-time Registration Only) */}
-      {showProfileModal && !studentProfile && (
+      {/* Student Profile Intake Modal (Registration & Switch) */}
+      {showProfileModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative">
+            {studentProfile && (
+              <button
+                type="button"
+                onClick={() => setShowProfileModal(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors text-sm"
+                title="Cancel"
+              >
+                ✕
+              </button>
+            )}
             <div className="space-y-2 text-center">
               <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto text-indigo-400">
                 <User className="w-6 h-6" />
               </div>
-              <h2 className="text-xl font-bold text-white tracking-tight">Student Registration</h2>
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                {studentProfile ? "Switch / Register Student" : "Student Registration"}
+              </h2>
               <p className="text-xs text-slate-400">
-                Apna Naam aur Roll No dhyan se enter karein. Registration ke baad identity lock ho jayegi taaki koi doosra student aapki performance change na kar sake.
+                Apna Naam aur Roll No enter karein. Record automatically Teacher Admin Panel me sync ho jayega.
               </p>
             </div>
 
@@ -989,7 +1023,7 @@ function PracticeContent() {
                   className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
                 >
                   <Check className="w-4 h-4" />
-                  <span>Register & Start Practice</span>
+                  <span>{studentProfile ? "Save & Switch Student" : "Register & Start Practice"}</span>
                 </button>
               </div>
             </form>

@@ -258,7 +258,13 @@ export default function AdminDashboardPage() {
     const matchesSearch =
       r.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.rollNo.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSection = selectedSection === "ALL" || r.section === selectedSection;
+    const matchesSection =
+      selectedSection === "ALL" ||
+      r.section === selectedSection ||
+      r.section === `8-${selectedSection}` ||
+      r.section === `8${selectedSection}` ||
+      r.section?.endsWith(selectedSection) ||
+      (selectedSection.startsWith("8-") && r.section === selectedSection.replace("8-", ""));
     const matchesTier =
       selectedTier === "ALL" ||
       (selectedTier === "AT_RISK" && (r.theta < -0.3 || r.accuracyPct < 50)) ||
@@ -577,10 +583,10 @@ export default function AdminDashboardPage() {
               className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-300 focus:outline-none focus:border-indigo-500"
             >
               <option value="ALL">All Sections (A-D)</option>
-              <option value="A">Section A</option>
-              <option value="B">Section B</option>
-              <option value="C">Section C</option>
-              <option value="D">Section D</option>
+              <option value="8-A">Section 8-A</option>
+              <option value="8-B">Section 8-B</option>
+              <option value="8-C">Section 8-C</option>
+              <option value="8-D">Section 8-D</option>
             </select>
 
             {/* Mastery Tier Filter */}
