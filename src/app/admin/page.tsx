@@ -44,7 +44,7 @@ import {
   addStudentRecordOnServer,
 } from "@/lib/firebase";
 
-export interface AggregatedStudent {
+interface AggregatedStudent {
   studentKey: string;
   studentName: string;
   rollNo: string;
@@ -67,6 +67,41 @@ export interface AggregatedStudent {
   isAtRisk: boolean;
   records: StudentPerformanceRecord[];
   latestRecord: StudentPerformanceRecord;
+}
+
+function formatDynamicRelativeTime(timeStr?: string, timestamp?: number): string {
+  let ts = timestamp;
+  if (!ts && timeStr) {
+    const isYesterday = timeStr.toLowerCase().includes("yesterday");
+    const cleanTime = timeStr.replace(/yesterday,?\s*/i, "").trim();
+    const match = cleanTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (match) {
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const ampm = match[3].toUpperCase();
+      if (ampm === "PM" && hours < 12) hours += 12;
+      if (ampm === "AM" && hours === 12) hours = 0;
+      const now = new Date();
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+      if (isYesterday) d.setDate(d.getDate() - 1);
+      ts = d.getTime();
+    }
+  }
+
+  if (!ts) return timeStr || "Recently";
+
+  const diffMs = Date.now() - ts;
+  if (diffMs < 0 || diffMs < 45 * 1000) return "Just now";
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffMin === 1) return "1 min ago";
+  if (diffMin < 60) return `${diffMin} mins ago`;
+  if (diffHour === 1) return "1 hour ago";
+  if (diffHour < 24) return `${diffHour} hours ago`;
+  if (diffDay === 1) return "Yesterday";
+  return `${diffDay} days ago`;
 }
 
 export default function AdminDashboardPage() {
@@ -386,7 +421,7 @@ export default function AdminDashboardPage() {
         totalCorrect,
         overallAccuracyPct,
         latestAttemptAt: latest.lastAttemptAt || "08:15 PM",
-        latestActive: latest.lastActive || "Recently",
+        latestActive: formatDynamicRelativeTime(latest.lastAttemptAt, latest.lastAttemptTimestamp),
         latestAttemptTimestamp: latest.lastAttemptTimestamp || 0,
         totalDurationSeconds,
         totalDurationFormatted,
