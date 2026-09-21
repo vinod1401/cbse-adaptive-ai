@@ -108,20 +108,21 @@ export async function fetchAllStudentRecords(): Promise<StudentPerformanceRecord
 }
 
 /**
- * Delete a single student record from server and cache (Teacher Authenticated).
+ * Delete single or multiple student records from server and cache (Teacher Authenticated).
  */
 export async function deleteStudentRecordOnServer(
-  id: string
+  idOrIds: string | string[]
 ): Promise<{ success: boolean; records?: StudentPerformanceRecord[]; error?: string }> {
   try {
+    const payload = Array.isArray(idOrIds) ? { ids: idOrIds } : { id: idOrIds };
     const res = await fetch("/api/student/records", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (res.ok && data.success) {
-      deleteCachedStudentRecord(id);
+      deleteCachedStudentRecord(idOrIds);
       if (Array.isArray(data.records)) {
         cacheStudentRoster(data.records);
       }

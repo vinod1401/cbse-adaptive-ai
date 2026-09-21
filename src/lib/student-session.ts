@@ -77,11 +77,12 @@ export function cacheStudentRoster(records: StudentPerformanceRecord[]): void {
   } catch {}
 }
 
-export function deleteCachedStudentRecord(id: string): void {
+export function deleteCachedStudentRecord(idOrIds: string | string[]): void {
   if (typeof window === 'undefined') return;
   try {
     const list = getCachedStudentRoster();
-    const updated = list.filter((r) => r.id !== id);
+    const idSet = new Set(Array.isArray(idOrIds) ? idOrIds : [idOrIds]);
+    const updated = list.filter((r) => !idSet.has(r.id));
     localStorage.setItem(ROSTER_KEY, JSON.stringify(updated));
   } catch {}
 }
@@ -108,8 +109,8 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     questionsAttempted: 12,
     correctAnswers: 10,
     accuracyPct: 83,
-    lastActive: "15 mins ago",
-    lastAttemptAt: "08:05 AM",
+    lastActive: "30 mins ago",
+    lastAttemptAt: "08:30 PM",
     sessionDurationSeconds: 780,
     sessionDurationFormatted: "13m 00s",
     flaggedMisconceptions: ["Inverting fraction in division occasionally"],
@@ -128,8 +129,8 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     questionsAttempted: 9,
     correctAnswers: 7,
     accuracyPct: 78,
-    lastActive: "5 mins ago",
-    lastAttemptAt: "08:15 AM",
+    lastActive: "15 mins ago",
+    lastAttemptAt: "08:45 PM",
     sessionDurationSeconds: 675,
     sessionDurationFormatted: "11m 15s",
     flaggedMisconceptions: [],
@@ -149,7 +150,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 4,
     accuracyPct: 40,
     lastActive: "45 mins ago",
-    lastAttemptAt: "07:35 AM",
+    lastAttemptAt: "08:15 PM",
     sessionDurationSeconds: 620,
     sessionDurationFormatted: "10m 20s",
     flaggedMisconceptions: ["Sign change error when transposing across equals sign"],
@@ -169,7 +170,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 11,
     accuracyPct: 73,
     lastActive: "1 hour ago",
-    lastAttemptAt: "07:20 AM",
+    lastAttemptAt: "08:00 PM",
     sessionDurationSeconds: 940,
     sessionDurationFormatted: "15m 40s",
     flaggedMisconceptions: ["Omits 2ab cross term in (a+b)^2 expansion"],
@@ -189,7 +190,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 13,
     accuracyPct: 93,
     lastActive: "2 hours ago",
-    lastAttemptAt: "06:15 AM",
+    lastAttemptAt: "07:00 PM",
     sessionDurationSeconds: 860,
     sessionDurationFormatted: "14m 20s",
     flaggedMisconceptions: [],
@@ -229,7 +230,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 6,
     accuracyPct: 75,
     lastActive: "10 mins ago",
-    lastAttemptAt: "08:10 AM",
+    lastAttemptAt: "08:50 PM",
     sessionDurationSeconds: 710,
     sessionDurationFormatted: "11m 50s",
     flaggedMisconceptions: [],
@@ -248,8 +249,8 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     questionsAttempted: 6,
     correctAnswers: 4,
     accuracyPct: 67,
-    lastActive: "30 mins ago",
-    lastAttemptAt: "07:50 AM",
+    lastActive: "35 mins ago",
+    lastAttemptAt: "08:25 PM",
     sessionDurationSeconds: 510,
     sessionDurationFormatted: "8m 30s",
     flaggedMisconceptions: ["Reciprocal error during fraction division"],
@@ -268,8 +269,8 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     questionsAttempted: 7,
     correctAnswers: 5,
     accuracyPct: 71,
-    lastActive: "15 mins ago",
-    lastAttemptAt: "08:05 AM",
+    lastActive: "8 mins ago",
+    lastAttemptAt: "08:52 PM",
     sessionDurationSeconds: 580,
     sessionDurationFormatted: "9m 40s",
     flaggedMisconceptions: [],
@@ -289,7 +290,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     correctAnswers: 6,
     accuracyPct: 75,
     lastActive: "40 mins ago",
-    lastAttemptAt: "07:40 AM",
+    lastAttemptAt: "08:20 PM",
     sessionDurationSeconds: 615,
     sessionDurationFormatted: "10m 15s",
     flaggedMisconceptions: [],

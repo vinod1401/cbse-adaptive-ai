@@ -113,7 +113,7 @@ export async function DELETE(request: Request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { id, all, resetBaseline } = body;
+    const { id, ids, all, resetBaseline } = body;
 
     // 1. Reset to baseline demo data
     if (resetBaseline) {
@@ -136,10 +136,24 @@ export async function DELETE(request: Request) {
       });
     }
 
-    // 3. Delete individual student record
+    // 3. Delete multiple or single student records
+    if (Array.isArray(ids) && ids.length > 0) {
+      for (const recId of ids) {
+        if (typeof recId === "string") {
+          await deleteStudentRecord(recId);
+        }
+      }
+      const updatedRecords = await getAllStudentRecords();
+      return NextResponse.json({
+        success: true,
+        message: `${ids.length} records removed successfully.`,
+        records: updatedRecords,
+      });
+    }
+
     if (!id || typeof id !== "string") {
       return NextResponse.json(
-        { error: "Record ID is required for single deletion." },
+        { error: "Record ID or IDs array is required for deletion." },
         { status: 400 }
       );
     }

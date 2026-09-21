@@ -80,7 +80,7 @@ export async function POST(request: Request) {
           minute: "2-digit",
           hour12: true,
           timeZone: "Asia/Kolkata",
-        }).format(new Date(nowTs));
+        }).format(new Date(nowTs)).toUpperCase();
       } catch {
         const d = new Date(nowTs);
         let hours = d.getHours();
@@ -89,6 +89,8 @@ export async function POST(request: Request) {
         hours = hours % 12 || 12;
         computedTimeStr = `${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes} ${ampm}`;
       }
+    } else {
+      computedTimeStr = String(computedTimeStr).toUpperCase();
     }
 
     const durationSec = typeof sessionDurationSeconds === "number" ? sessionDurationSeconds : 0;

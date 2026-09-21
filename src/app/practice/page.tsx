@@ -287,9 +287,9 @@ function PracticeContent() {
         minute: "2-digit",
         hour12: true,
         timeZone: "Asia/Kolkata",
-      }).format(new Date());
+      }).format(new Date()).toUpperCase();
     } catch {
-      regTimeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      regTimeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }).toUpperCase();
     }
 
     // 1. Immediately register student in authoritative store and roster
@@ -403,7 +403,7 @@ function PracticeContent() {
               minute: "2-digit",
               hour12: true,
               timeZone: "Asia/Kolkata",
-            }).format(new Date());
+            }).format(new Date()).toUpperCase();
           } catch {
             const d = new Date();
             let hours = d.getHours();

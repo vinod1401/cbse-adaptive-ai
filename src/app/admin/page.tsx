@@ -44,6 +44,31 @@ import {
   addStudentRecordOnServer,
 } from "@/lib/firebase";
 
+export interface AggregatedStudent {
+  studentKey: string;
+  studentName: string;
+  rollNo: string;
+  section: string;
+  topicsCount: number;
+  latestTopicTitle: string;
+  topicTitles: string[];
+  avgTheta: number;
+  avgMasteryPct: number;
+  overallTier: { label: string; badge: string };
+  totalAttempted: number;
+  totalCorrect: number;
+  overallAccuracyPct: number;
+  latestAttemptAt: string;
+  latestActive: string;
+  latestAttemptTimestamp: number;
+  totalDurationFormatted: string;
+  totalDurationSeconds: number;
+  allMisconceptions: string[];
+  isAtRisk: boolean;
+  records: StudentPerformanceRecord[];
+  latestRecord: StudentPerformanceRecord;
+}
+
 export default function AdminDashboardPage() {
   const topics = getAllTopics();
   const [records, setRecords] = useState<StudentPerformanceRecord[]>([]);
@@ -70,6 +95,7 @@ export default function AdminDashboardPage() {
 
   // Deletion & Data Management State
   const [recordToDelete, setRecordToDelete] = useState<StudentPerformanceRecord | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<AggregatedStudent | null>(null);
   const [showClearAllModal, setShowClearAllModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -157,6 +183,39 @@ export default function AdminDashboardPage() {
       setActionFeedback({
         type: "error",
         message: res.error || "Failed to delete student record.",
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    }
+  };
+
+  const handleDeleteStudent = async () => {
+    if (!studentToDelete) return;
+    setActionLoading(true);
+    const ids = studentToDelete.records.map((r) => r.id);
+    const res = await deleteStudentRecordOnServer(ids);
+    setActionLoading(false);
+    if (res.success) {
+      if (res.records) {
+        setRecords(res.records);
+      } else {
+        const idSet = new Set(ids);
+        setRecords((prev) => prev.filter((r) => !idSet.has(r.id)));
+      }
+      if (selectedStudentModal && ids.includes(selectedStudentModal.id)) {
+        setSelectedStudentModal(null);
+      }
+      const deletedName = studentToDelete.studentName;
+      const deletedRoll = studentToDelete.rollNo;
+      setStudentToDelete(null);
+      setActionFeedback({
+        type: "success",
+        message: `Student "${deletedName}" (Roll #${deletedRoll}) and all associated records deleted successfully.`,
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    } else {
+      setActionFeedback({
+        type: "error",
+        message: res.error || "Failed to delete student.",
       });
       setTimeout(() => setActionFeedback(null), 4000);
     }
@@ -253,28 +312,122 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated]);
 
-  // Filtered Roster
-  const filteredRecords = records.filter((r) => {
+  // Group all records by unique student identity (rollNo + section)
+  const uniqueStudents: AggregatedStudent[] = React.useMemo(() => {
+    const map = new Map<string, StudentPerformanceRecord[]>();
+
+    records.forEach((r) => {
+      const sanitizedRoll = String(r.rollNo || "").trim().toLowerCase();
+      const sanitizedSec = String(r.section || "").trim().toLowerCase().replace(/^8-?/, "");
+      const key = `${sanitizedRoll}_${sanitizedSec}`;
+      const existing = map.get(key) || [];
+      existing.push(r);
+      map.set(key, existing);
+    });
+
+    const result: AggregatedStudent[] = [];
+
+    map.forEach((stRecords, key) => {
+      if (!stRecords || stRecords.length === 0) return;
+
+      // Sort by lastAttemptTimestamp descending to get latest record first
+      const sorted = [...stRecords].sort((a, b) => {
+        const tsA = typeof a.lastAttemptTimestamp === "number" ? a.lastAttemptTimestamp : 0;
+        const tsB = typeof b.lastAttemptTimestamp === "number" ? b.lastAttemptTimestamp : 0;
+        return tsB - tsA;
+      });
+
+      const latest = sorted[0];
+      const topicsCount = sorted.length;
+      const topicTitles = Array.from(new Set(sorted.map((s) => s.topicTitle)));
+
+      const totalAttempted = sorted.reduce((sum, r) => sum + (r.questionsAttempted || 0), 0);
+      const totalCorrect = sorted.reduce((sum, r) => sum + (r.correctAnswers || 0), 0);
+      const overallAccuracyPct = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
+
+      const avgTheta = Number((sorted.reduce((sum, r) => sum + (r.theta || 0), 0) / topicsCount).toFixed(2));
+      const avgMasteryPct = Math.round(sorted.reduce((sum, r) => sum + (r.masteryPct || 0), 0) / topicsCount);
+
+      let overallTier = latest.tier || { label: "Proficient", badge: "🟡 Proficient" };
+      if (avgTheta >= 1.0) {
+        overallTier = { label: "Advanced", badge: "🏆 Level 3: Advanced" };
+      } else if (avgTheta >= -0.3) {
+        overallTier = { label: "Proficient", badge: "🟡 Level 2: Proficient" };
+      } else {
+        overallTier = { label: "Foundation", badge: "🔴 Remedial Needed" };
+      }
+
+      const totalDurationSeconds = sorted.reduce((sum, r) => sum + (r.sessionDurationSeconds || 0), 0);
+      let totalDurationFormatted = latest.sessionDurationFormatted || "< 1 min";
+      if (totalDurationSeconds > 0) {
+        const m = Math.floor(totalDurationSeconds / 60);
+        const s = totalDurationSeconds % 60;
+        totalDurationFormatted = m === 0 ? `${s}s` : `${m}m ${s < 10 ? "0" : ""}${s}s`;
+      }
+
+      const allMisconceptions = Array.from(
+        new Set(sorted.flatMap((r) => r.flaggedMisconceptions || []).filter(Boolean))
+      );
+
+      const isAtRisk = avgTheta < -0.3 || overallAccuracyPct < 50;
+
+      result.push({
+        studentKey: key,
+        studentName: latest.studentName,
+        rollNo: latest.rollNo,
+        section: latest.section,
+        topicsCount,
+        latestTopicTitle: latest.topicTitle,
+        topicTitles,
+        avgTheta,
+        avgMasteryPct,
+        overallTier,
+        totalAttempted,
+        totalCorrect,
+        overallAccuracyPct,
+        latestAttemptAt: latest.lastAttemptAt || "08:15 PM",
+        latestActive: latest.lastActive || "Recently",
+        latestAttemptTimestamp: latest.lastAttemptTimestamp || 0,
+        totalDurationSeconds,
+        totalDurationFormatted,
+        allMisconceptions,
+        isAtRisk,
+        records: sorted,
+        latestRecord: latest,
+      });
+    });
+
+    // Sort by roll number numeric ascending
+    return result.sort((a, b) => {
+      const numA = parseInt(a.rollNo, 10);
+      const numB = parseInt(b.rollNo, 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.rollNo.localeCompare(b.rollNo);
+    });
+  }, [records]);
+
+  // Filtered Students Roster (One row per unique student)
+  const filteredStudents = uniqueStudents.filter((std) => {
     const matchesSearch =
-      r.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.rollNo.toLowerCase().includes(searchQuery.toLowerCase());
+      std.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      std.rollNo.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSection =
       selectedSection === "ALL" ||
-      r.section === selectedSection ||
-      r.section === `8-${selectedSection}` ||
-      r.section === `8${selectedSection}` ||
-      r.section?.endsWith(selectedSection) ||
-      (selectedSection.startsWith("8-") && r.section === selectedSection.replace("8-", ""));
+      std.section === selectedSection ||
+      std.section === `8-${selectedSection}` ||
+      std.section === `8${selectedSection}` ||
+      std.section?.endsWith(selectedSection) ||
+      (selectedSection.startsWith("8-") && std.section === selectedSection.replace("8-", ""));
     const matchesTier =
       selectedTier === "ALL" ||
-      (selectedTier === "AT_RISK" && (r.theta < -0.3 || r.accuracyPct < 50)) ||
-      (selectedTier === "PROFICIENT" && r.theta >= -0.3 && r.theta < 1.0) ||
-      (selectedTier === "ADVANCED" && r.theta >= 1.0);
+      (selectedTier === "AT_RISK" && std.isAtRisk) ||
+      (selectedTier === "PROFICIENT" && !std.isAtRisk && std.avgTheta < 1.0) ||
+      (selectedTier === "ADVANCED" && std.avgTheta >= 1.0);
 
     return matchesSearch && matchesSection && matchesTier;
   });
 
-  // Selected student multi-topic history
+  // Selected student multi-topic history (For Modal Report Card)
   const selectedStudentTopics = selectedStudentModal
     ? records.filter(
         (r) =>
@@ -288,50 +441,66 @@ export default function AdminDashboardPage() {
   const totalCorrectAnswers = selectedStudentTopics.reduce((sum, r) => sum + r.correctAnswers, 0);
   const overallAccuracy = totalAttemptedQuestions > 0 ? Math.round((totalCorrectAnswers / totalAttemptedQuestions) * 100) : 0;
 
-  // Analytics Metrics
-  const totalStudents = records.length;
+  const modalAvgTheta = selectedStudentTopics.length > 0
+    ? Number((selectedStudentTopics.reduce((sum, r) => sum + (r.theta || 0), 0) / selectedStudentTopics.length).toFixed(2))
+    : (selectedStudentModal?.theta || 0);
+
+  const modalAvgMastery = selectedStudentTopics.length > 0
+    ? Math.round(selectedStudentTopics.reduce((sum, r) => sum + (r.masteryPct || 0), 0) / selectedStudentTopics.length)
+    : (selectedStudentModal?.masteryPct || 50);
+
+  const modalTierBadge = modalAvgTheta >= 1.0
+    ? "🏆 Level 3: Advanced"
+    : modalAvgTheta >= -0.3
+    ? "🟡 Level 2: Proficient"
+    : "🔴 Remedial Needed";
+
+  // Analytics Metrics across unique students
+  const totalStudents = uniqueStudents.length;
   const avgTheta =
     totalStudents > 0
-      ? (records.reduce((sum, r) => sum + r.theta, 0) / totalStudents).toFixed(2)
+      ? (uniqueStudents.reduce((sum, s) => sum + s.avgTheta, 0) / totalStudents).toFixed(2)
       : "+0.00";
   const avgMastery =
     totalStudents > 0
-      ? Math.round(records.reduce((sum, r) => sum + r.masteryPct, 0) / totalStudents)
+      ? Math.round(uniqueStudents.reduce((sum, s) => sum + s.avgMasteryPct, 0) / totalStudents)
       : 50;
-  const atRiskCount = records.filter((r) => r.theta < -0.3 || r.accuracyPct < 50).length;
+  const atRiskCount = uniqueStudents.filter((s) => s.isAtRisk).length;
 
-  // Export to CSV
+  // Export to CSV (Unique Students)
   const handleExportCSV = () => {
     const headers = [
       "Roll No",
       "Student Name",
       "Section",
-      "Topic",
-      "Ability (Theta)",
-      "Mastery %",
-      "Tier",
-      "Questions Attempted",
-      "Correct Answers",
-      "Accuracy %",
+      "Topics Attempted",
+      "Latest Topic",
+      "Average Ability (Theta)",
+      "Average Mastery %",
+      "Overall Tier",
+      "Total Questions Attempted",
+      "Total Correct Answers",
+      "Overall Accuracy %",
       "Last Attempt Time",
       "Session Duration",
       "Flagged Misconceptions"
     ];
 
-    const rows = filteredRecords.map((r) => [
-      `"${r.rollNo}"`,
-      `"${r.studentName}"`,
-      `"${r.section}"`,
-      `"${r.topicTitle}"`,
-      r.theta >= 0 ? `+${r.theta.toFixed(2)}` : r.theta.toFixed(2),
-      `${r.masteryPct}%`,
-      `"${r.tier.label}"`,
-      r.questionsAttempted,
-      r.correctAnswers,
-      `${r.accuracyPct}%`,
-      `"${r.lastAttemptAt || r.lastActive || ""}"`,
-      `"${r.sessionDurationFormatted || ""}"`,
-      `"${(r.flaggedMisconceptions || []).join("; ")}"`
+    const rows = filteredStudents.map((s) => [
+      `"${s.rollNo}"`,
+      `"${s.studentName}"`,
+      `"${s.section}"`,
+      s.topicsCount,
+      `"${s.latestTopicTitle}"`,
+      s.avgTheta >= 0 ? `+${s.avgTheta.toFixed(2)}` : s.avgTheta.toFixed(2),
+      `${s.avgMasteryPct}%`,
+      `"${s.overallTier.label}"`,
+      s.totalAttempted,
+      s.totalCorrect,
+      `${s.overallAccuracyPct}%`,
+      `"${s.latestAttemptAt}"`,
+      `"${s.totalDurationFormatted}"`,
+      `"${s.allMisconceptions.join("; ")}"`
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
@@ -496,7 +665,7 @@ export default function AdminDashboardPage() {
 
           <button
             onClick={handleExportCSV}
-            disabled={filteredRecords.length === 0}
+            disabled={filteredStudents.length === 0}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all"
           >
             <Download className="w-3.5 h-3.5" />
@@ -640,55 +809,70 @@ export default function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
-              {filteredRecords.length === 0 ? (
+              {filteredStudents.length === 0 ? (
                 <tr>
                   <td colSpan={11} className="py-12 text-center text-slate-500 text-xs">
                     No student performance records found matching your filters.
                   </td>
                 </tr>
               ) : (
-                filteredRecords.map((std, idx) => {
-                  const isAtRisk = std.theta < -0.3 || std.accuracyPct < 50;
+                filteredStudents.map((std) => {
                   return (
                     <tr
-                      key={std.id || idx}
-                      onClick={() => setSelectedStudentModal(std)}
+                      key={std.studentKey}
+                      onClick={() => setSelectedStudentModal(std.latestRecord)}
                       className="hover:bg-slate-800/40 cursor-pointer transition-colors"
                     >
                       <td className="py-3.5 px-4 font-mono text-xs text-slate-400">#{std.rollNo}</td>
-                      <td className="py-3.5 px-4 font-semibold text-white">{std.studentName}</td>
+                      <td className="py-3.5 px-4 font-semibold text-white">
+                        <div className="flex items-center gap-2">
+                          <span>{std.studentName}</span>
+                          {std.topicsCount > 1 && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono font-medium">
+                              {std.topicsCount} Topics
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="py-3.5 px-4 font-mono text-xs text-indigo-300">Sec {std.section}</td>
-                      <td className="py-3.5 px-4 text-xs text-slate-300 max-w-[180px] truncate">{std.topicTitle}</td>
+                      <td className="py-3.5 px-4 text-xs text-slate-300 max-w-[200px]">
+                        <div className="truncate font-medium">{std.latestTopicTitle}</div>
+                        {std.topicsCount > 1 && (
+                          <div className="text-[10px] text-slate-500 truncate">
+                            +{std.topicsCount - 1} more ({std.records.slice(1).map((r) => r.topicTitle).join(", ")})
+                          </div>
+                        )}
+                      </td>
                       <td className="py-3.5 px-4 font-mono font-bold text-xs">
-                        <span className={std.theta >= 0 ? "text-emerald-400" : "text-rose-400"}>
-                          {std.theta >= 0 ? `+${std.theta.toFixed(2)}` : std.theta.toFixed(2)}
+                        <span className={std.avgTheta >= 0 ? "text-emerald-400" : "text-rose-400"}>
+                          {std.avgTheta >= 0 ? `+${std.avgTheta.toFixed(2)}` : std.avgTheta.toFixed(2)}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-xs">{std.masteryPct}%</td>
+                      <td className="py-3.5 px-4 font-mono text-xs">{std.avgMasteryPct}%</td>
                       <td className="py-3.5 px-4 font-mono text-xs">
-                        <span className={std.accuracyPct >= 70 ? "text-emerald-400" : isAtRisk ? "text-rose-400" : "text-amber-400"}>
-                          {std.accuracyPct}% ({std.correctAnswers}/{std.questionsAttempted})
+                        <span className={std.overallAccuracyPct >= 70 ? "text-emerald-400" : std.isAtRisk ? "text-rose-400" : "text-amber-400"}>
+                          {std.overallAccuracyPct}% ({std.totalCorrect}/{std.totalAttempted})
                         </span>
                       </td>
                       {/* Last Attempt (Kitne Baje) */}
                       <td className="py-3.5 px-4 font-mono text-xs whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-indigo-300 font-semibold">{std.lastAttemptAt || "08:15 AM"}</span>
-                          <span className="text-[10px] text-slate-500">{std.lastActive}</span>
+                          <span className="text-indigo-300 font-semibold">{std.latestAttemptAt}</span>
+                          <span className="text-[10px] text-slate-500">{std.latestActive}</span>
                         </div>
                       </td>
                       {/* Session Duration (Kitne Time Ka Tha) */}
                       <td className="py-3.5 px-4 font-mono text-xs whitespace-nowrap">
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-semibold">
                           <Clock className="w-3 h-3 text-amber-400 flex-shrink-0" />
-                          <span>{std.sessionDurationFormatted || "< 1 min"}</span>
+                          <span>{std.totalDurationFormatted}</span>
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
-                        {std.flaggedMisconceptions && std.flaggedMisconceptions.length > 0 ? (
+                        {std.allMisconceptions && std.allMisconceptions.length > 0 ? (
                           <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
                             <AlertTriangle className="w-3 h-3" />
-                            <span>{std.flaggedMisconceptions.length} flagged</span>
+                            <span>{std.allMisconceptions.length} flagged</span>
                           </span>
                         ) : (
                           <span className="text-[11px] text-emerald-400 font-medium">None flagged 👍</span>
@@ -699,7 +883,7 @@ export default function AdminDashboardPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedStudentModal(std);
+                              setSelectedStudentModal(std.latestRecord);
                             }}
                             className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white text-xs font-semibold transition-colors inline-flex items-center gap-1"
                           >
@@ -710,10 +894,10 @@ export default function AdminDashboardPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setRecordToDelete(std);
+                              setStudentToDelete(std);
                             }}
                             className="p-1 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700/60 hover:border-rose-500/40 transition-colors"
-                            title={`Delete record for ${std.studentName} (Roll #${std.rollNo})`}
+                            title={`Delete student ${std.studentName} (Roll #${std.rollNo})`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -792,45 +976,45 @@ export default function AdminDashboardPage() {
                 <div>
                   <span className="text-slate-400 print:text-gray-500 block">Last Attempt / Duration</span>
                   <span className="font-semibold text-white print:text-black block mt-0.5 font-mono">
-                    {selectedStudentModal.lastAttemptAt || "08:15 AM"} ({selectedStudentModal.sessionDurationFormatted || "< 1 min"})
+                    {selectedStudentModal.lastAttemptAt || "08:15 PM"} ({selectedStudentModal.sessionDurationFormatted || "< 1 min"})
                   </span>
                 </div>
               </div>
 
-              {/* Psychometric Scores Grid (Selected Session Overview) */}
+              {/* Psychometric Scores Grid (Overall Student Performance Across Attempted Topics) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                 <div className="p-3 rounded-xl bg-slate-950 print:bg-gray-50 border border-slate-800 print:border-gray-300">
-                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Current Ability (\(\theta\))</span>
+                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Overall Ability (\(\theta\))</span>
                   <span className="text-base font-bold font-mono text-emerald-400 print:text-emerald-700">
-                    {selectedStudentModal.theta >= 0 ? `+${selectedStudentModal.theta.toFixed(2)}` : selectedStudentModal.theta.toFixed(2)}
+                    {modalAvgTheta >= 0 ? `+${modalAvgTheta.toFixed(2)}` : modalAvgTheta.toFixed(2)}
                   </span>
                   <span className="text-[10px] text-slate-500 print:text-gray-500 block">
-                    95% CI: {getThetaConfidenceInterval(selectedStudentModal.theta, 0.35).formatted}
+                    95% CI: {getThetaConfidenceInterval(modalAvgTheta, 0.35).formatted}
                   </span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950 print:bg-gray-50 border border-slate-800 print:border-gray-300">
-                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Mastery Index</span>
+                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Overall Mastery</span>
                   <span className="text-base font-bold font-mono text-indigo-400 print:text-indigo-700">
-                    {selectedStudentModal.masteryPct}%
+                    {modalAvgMastery}%
                   </span>
-                  <span className="text-[10px] text-slate-500 print:text-gray-500 block">Sigmoid Ogive</span>
+                  <span className="text-[10px] text-slate-500 print:text-gray-500 block">Across {selectedStudentTopics.length} topic{selectedStudentTopics.length > 1 ? "s" : ""}</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950 print:bg-gray-50 border border-slate-800 print:border-gray-300">
-                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Accuracy</span>
+                  <span className="text-[11px] text-slate-400 print:text-gray-600 block">Overall Accuracy</span>
                   <span className="text-base font-bold font-mono text-white print:text-black">
-                    {selectedStudentModal.accuracyPct}%
+                    {overallAccuracy}%
                   </span>
                   <span className="text-[10px] text-slate-500 print:text-gray-500 block">
-                    {selectedStudentModal.correctAnswers} / {selectedStudentModal.questionsAttempted} Items
+                    {totalCorrectAnswers} / {totalAttemptedQuestions} Items
                   </span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950 print:bg-gray-50 border border-slate-800 print:border-gray-300">
                   <span className="text-[11px] text-slate-400 print:text-gray-600 block">Assigned Tier</span>
                   <span className="text-sm font-bold text-white print:text-black block mt-0.5">
-                    {selectedStudentModal.tier?.badge || "Proficient"}
+                    {modalTierBadge}
                   </span>
                 </div>
               </div>
@@ -962,9 +1146,21 @@ export default function AdminDashboardPage() {
               </button>
 
               <button
-                onClick={() => setRecordToDelete(selectedStudentModal)}
+                onClick={() => {
+                  const studentObj = uniqueStudents.find(
+                    (s) =>
+                      s.rollNo.toLowerCase() === selectedStudentModal.rollNo.toLowerCase() &&
+                      (s.section.toLowerCase() === selectedStudentModal.section.toLowerCase() ||
+                        s.studentName.toLowerCase() === selectedStudentModal.studentName.toLowerCase())
+                  );
+                  if (studentObj) {
+                    setStudentToDelete(studentObj);
+                  } else {
+                    setRecordToDelete(selectedStudentModal);
+                  }
+                }}
                 className="px-4 py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all"
-                title="Delete this record"
+                title="Delete this student"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-400" />
                 <span>Delete</span>
@@ -975,6 +1171,53 @@ export default function AdminDashboardPage() {
                 className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Student (All Records) Confirmation Modal */}
+      {studentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
+          <div className="w-full max-w-md bg-slate-900 border border-rose-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-bold text-white tracking-tight">Delete Student?</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Kya aap <span className="font-semibold text-white">{studentToDelete.studentName}</span> (Roll #{studentToDelete.rollNo}, Section {studentToDelete.section}) ko roster se permanently remove karna chahte hain?
+              </p>
+              <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-left text-xs text-slate-300 space-y-1">
+                <div>
+                  <span className="text-slate-500">Attempted Topics ({studentToDelete.topicsCount}):</span>{" "}
+                  {studentToDelete.records.map((r) => r.topicTitle).join(", ")}
+                </div>
+                <div>
+                  <span className="text-slate-500">Overall Mastery:</span> {studentToDelete.avgMasteryPct}% · Ability: {studentToDelete.avgTheta >= 0 ? `+${studentToDelete.avgTheta}` : studentToDelete.avgTheta}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStudentToDelete(null)}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteStudent}
+                disabled={actionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all"
+              >
+                {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                <span>Confirm Delete</span>
               </button>
             </div>
           </div>
