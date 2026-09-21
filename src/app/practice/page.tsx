@@ -167,6 +167,47 @@ function PracticeContent() {
     }
   }, []);
 
+  // Anti-cheat: prevent text selection, right-click context menu (which triggers Web Search), and copy shortcuts
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".secure-exam-area")) {
+        e.preventDefault();
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Block Ctrl+C / Cmd+C / Ctrl+A / Ctrl+U / Ctrl+S inside practice area
+      if ((e.ctrlKey || e.metaKey) && ["c", "C", "a", "A", "u", "U", "s", "S"].includes(e.key)) {
+        const activeEl = document.activeElement;
+        const isInputElement = activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement;
+        if (!isInputElement) {
+          e.preventDefault();
+          window.getSelection()?.removeAllRanges();
+        }
+      }
+    };
+
+    const handleSelectionChange = () => {
+      const sel = window.getSelection();
+      if (sel && sel.toString().length > 0) {
+        const anchor = sel.anchorNode?.parentElement;
+        if (anchor?.closest(".secure-exam-area")) {
+          sel.removeAllRanges();
+        }
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("selectionchange", handleSelectionChange);
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, []);
+
   const initSession = async (studentOverride?: StudentProfile) => {
     setLoading(true);
     setSelectedOption(null);
@@ -591,8 +632,14 @@ function PracticeContent() {
         </div>
       </div>
 
-      {/* Main Question Card */}
-      <div className="relative rounded-3xl bg-slate-900/70 border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+      {/* Main Question Card - Anti-Cheat Protected against text selection & browser web search */}
+      <div
+        onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        className="relative rounded-3xl bg-slate-900/70 border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6 select-none secure-exam-area"
+      >
         <div className="flex flex-wrap items-center justify-between border-b border-slate-800/80 pb-4 gap-3">
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -662,12 +709,19 @@ function PracticeContent() {
         </div>
 
         {/* Question Text with KaTeX */}
-        <div className="text-lg text-slate-100 font-medium leading-relaxed">
+        <div
+          onContextMenu={(e) => e.preventDefault()}
+          onCopy={(e) => e.preventDefault()}
+          className="text-lg text-slate-100 font-medium leading-relaxed select-none secure-exam-area"
+        >
           <MathRenderer content={currentItem.text} />
         </div>
 
         {/* Options Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+        <div
+          onContextMenu={(e) => e.preventDefault()}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 select-none secure-exam-area"
+        >
           {currentItem.options.map((opt: string, idx: number) => {
             const isSelected = selectedOption === opt;
             const isAnswered = feedback !== null;
