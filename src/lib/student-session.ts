@@ -94,6 +94,10 @@ export function clearCachedStudentRoster(): void {
   } catch {}
 }
 
+// Helper to compute a timestamp relative to now (used for demo baseline data)
+function _minsAgo(mins: number): number { return Date.now() - mins * 60 * 1000; }
+function _hoursAgo(hrs: number): number { return Date.now() - hrs * 60 * 60 * 1000; }
+
 export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
   {
     id: "08_8A_rational-numbers",
@@ -111,6 +115,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 83,
     lastActive: "30 mins ago",
     lastAttemptAt: "08:30 PM",
+    lastAttemptTimestamp: _minsAgo(30),
     sessionDurationSeconds: 780,
     sessionDurationFormatted: "13m 00s",
     flaggedMisconceptions: ["Inverting fraction in division occasionally"],
@@ -131,6 +136,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 78,
     lastActive: "15 mins ago",
     lastAttemptAt: "08:45 PM",
+    lastAttemptTimestamp: _minsAgo(15),
     sessionDurationSeconds: 675,
     sessionDurationFormatted: "11m 15s",
     flaggedMisconceptions: [],
@@ -151,6 +157,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 40,
     lastActive: "45 mins ago",
     lastAttemptAt: "08:15 PM",
+    lastAttemptTimestamp: _minsAgo(45),
     sessionDurationSeconds: 620,
     sessionDurationFormatted: "10m 20s",
     flaggedMisconceptions: ["Sign change error when transposing across equals sign"],
@@ -171,6 +178,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 73,
     lastActive: "1 hour ago",
     lastAttemptAt: "08:00 PM",
+    lastAttemptTimestamp: _hoursAgo(1),
     sessionDurationSeconds: 940,
     sessionDurationFormatted: "15m 40s",
     flaggedMisconceptions: ["Omits 2ab cross term in (a+b)^2 expansion"],
@@ -191,6 +199,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 93,
     lastActive: "2 hours ago",
     lastAttemptAt: "07:00 PM",
+    lastAttemptTimestamp: _hoursAgo(2),
     sessionDurationSeconds: 860,
     sessionDurationFormatted: "14m 20s",
     flaggedMisconceptions: [],
@@ -211,6 +220,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 25,
     lastActive: "Yesterday",
     lastAttemptAt: "Yesterday, 04:30 PM",
+    lastAttemptTimestamp: _hoursAgo(24),
     sessionDurationSeconds: 490,
     sessionDurationFormatted: "8m 10s",
     flaggedMisconceptions: ["Divides RHS instead of multiplying reciprocal", "Order of operations in multi-step brackets"],
@@ -231,6 +241,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 75,
     lastActive: "10 mins ago",
     lastAttemptAt: "08:50 PM",
+    lastAttemptTimestamp: _minsAgo(10),
     sessionDurationSeconds: 710,
     sessionDurationFormatted: "11m 50s",
     flaggedMisconceptions: [],
@@ -251,6 +262,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 67,
     lastActive: "35 mins ago",
     lastAttemptAt: "08:25 PM",
+    lastAttemptTimestamp: _minsAgo(35),
     sessionDurationSeconds: 510,
     sessionDurationFormatted: "8m 30s",
     flaggedMisconceptions: ["Reciprocal error during fraction division"],
@@ -271,6 +283,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 71,
     lastActive: "8 mins ago",
     lastAttemptAt: "08:52 PM",
+    lastAttemptTimestamp: _minsAgo(8),
     sessionDurationSeconds: 580,
     sessionDurationFormatted: "9m 40s",
     flaggedMisconceptions: [],
@@ -291,6 +304,7 @@ export const BASELINE_ROSTER: StudentPerformanceRecord[] = [
     accuracyPct: 75,
     lastActive: "40 mins ago",
     lastAttemptAt: "08:20 PM",
+    lastAttemptTimestamp: _minsAgo(40),
     sessionDurationSeconds: 615,
     sessionDurationFormatted: "10m 15s",
     flaggedMisconceptions: [],
