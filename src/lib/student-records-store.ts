@@ -1,7 +1,7 @@
 // ============================================================================
 // SERVER-SIDE STUDENT RECORDS STORE
 // Stores authenticated, server-verified student performance records.
-// Supports both in-memory caching and persistent Upstash Redis / Vercel KV REST.
+// Supports both in-memory caching, local JSON disk persistence, and Upstash/Vercel KV.
 // ============================================================================
 
 import { StudentPerformanceRecord, BASELINE_ROSTER } from "@/lib/student-session";
@@ -13,10 +13,6 @@ export { BASELINE_ROSTER };
 declare global {
   // eslint-disable-next-line no-var
   var __pragatiStudentRecordsStore: Map<string, StudentPerformanceRecord> | undefined;
-  // eslint-disable-next-line no-var
-  var __pragatiDeletedRecordIds: Set<string> | undefined;
-  // eslint-disable-next-line no-var
-  var __pragatiStoreClearedAll: boolean | undefined;
 }
 
 // Upstash Redis / Vercel KV REST Helper
@@ -26,7 +22,7 @@ const KV_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API
 // Local JSON Disk Persistence (Guarantees local & server survivability across restarts)
 const DATA_DIR = path.join(process.cwd(), "data");
 const RECORDS_FILE = path.join(DATA_DIR, "student-records.json");
-const DELETED_FILE = path.join(DATA_DIR, "deleted-records.json");
+const INITIALIZED_FLAG_FILE = path.join(DATA_DIR, ".initialized");
 
 function ensureDataDir() {
   try {
@@ -40,57 +36,59 @@ function persistToDisk() {
   try {
     ensureDataDir();
     const store = getMemoryStore();
-    const deletedSet = getDeletedStore();
     const records = Array.from(store.values());
     fs.writeFileSync(RECORDS_FILE, JSON.stringify(records, null, 2), "utf8");
-    fs.writeFileSync(DELETED_FILE, JSON.stringify(Array.from(deletedSet), null, 2), "utf8");
-  } catch {}
+    fs.writeFileSync(INITIALIZED_FLAG_FILE, "1", "utf8");
+  } catch (e) {
+    console.warn("Failed to persist student records to disk:", e);
+  }
 }
 
-function loadFromDisk() {
+function loadFromDisk(): void {
   try {
     ensureDataDir();
+
+    // 1. If RECORDS_FILE exists on disk, it is the authoritative local state
     if (fs.existsSync(RECORDS_FILE)) {
       const raw = fs.readFileSync(RECORDS_FILE, "utf8");
       const list = JSON.parse(raw);
-      if (Array.isArray(list) && list.length > 0) {
-        const store = globalThis.__pragatiStudentRecordsStore || new Map<string, StudentPerformanceRecord>();
-        list.forEach((rec) => store.set(rec.id, rec));
-        globalThis.__pragatiStudentRecordsStore = store;
-      }
-    }
-    if (fs.existsSync(DELETED_FILE)) {
-      const raw = fs.readFileSync(DELETED_FILE, "utf8");
-      const list = JSON.parse(raw);
       if (Array.isArray(list)) {
-        const delStore = globalThis.__pragatiDeletedRecordIds || new Set<string>();
-        list.forEach((d) => delStore.add(d));
-        globalThis.__pragatiDeletedRecordIds = delStore;
+        const store = new Map<string, StudentPerformanceRecord>();
+        list.forEach((rec) => {
+          if (rec && rec.id) store.set(rec.id, rec);
+        });
+        globalThis.__pragatiStudentRecordsStore = store;
+        return;
       }
     }
-  } catch {}
+
+    // 2. Initial first-time setup only (if file does not exist at all)
+    if (!fs.existsSync(INITIALIZED_FLAG_FILE)) {
+      const store = new Map<string, StudentPerformanceRecord>();
+      BASELINE_ROSTER.forEach((rec) => store.set(rec.id, rec));
+      globalThis.__pragatiStudentRecordsStore = store;
+      persistToDisk();
+      return;
+    }
+
+    // 3. Otherwise, initialized state with no file means empty store
+    globalThis.__pragatiStudentRecordsStore = new Map<string, StudentPerformanceRecord>();
+  } catch (e) {
+    console.warn("loadFromDisk warning:", e);
+    if (!globalThis.__pragatiStudentRecordsStore) {
+      globalThis.__pragatiStudentRecordsStore = new Map<string, StudentPerformanceRecord>();
+    }
+  }
 }
 
 function getMemoryStore(): Map<string, StudentPerformanceRecord> {
   if (!globalThis.__pragatiStudentRecordsStore) {
     loadFromDisk();
     if (!globalThis.__pragatiStudentRecordsStore) {
-      const store = new Map<string, StudentPerformanceRecord>();
-      if (!globalThis.__pragatiStoreClearedAll) {
-        BASELINE_ROSTER.forEach((rec) => store.set(rec.id, rec));
-      }
-      globalThis.__pragatiStudentRecordsStore = store;
-      persistToDisk();
+      globalThis.__pragatiStudentRecordsStore = new Map<string, StudentPerformanceRecord>();
     }
   }
   return globalThis.__pragatiStudentRecordsStore;
-}
-
-function getDeletedStore(): Set<string> {
-  if (!globalThis.__pragatiDeletedRecordIds) {
-    globalThis.__pragatiDeletedRecordIds = new Set<string>();
-  }
-  return globalThis.__pragatiDeletedRecordIds;
 }
 
 async function redisCommand(args: (string | number)[]): Promise<any> {
@@ -114,10 +112,6 @@ async function redisCommand(args: (string | number)[]): Promise<any> {
 }
 
 export async function saveStudentRecord(record: StudentPerformanceRecord): Promise<void> {
-  // Revive if previously marked deleted
-  const deletedSet = getDeletedStore();
-  deletedSet.delete(record.id);
-
   // 1. In-memory store
   const store = getMemoryStore();
   store.set(record.id, record);
@@ -126,17 +120,14 @@ export async function saveStudentRecord(record: StudentPerformanceRecord): Promi
   persistToDisk();
 
   // 3. Cloud KV persistence (if configured)
-  await redisCommand(["SREM", "cbse_deleted_record_ids", record.id]);
+  await redisCommand(["DEL", "cbse_all_cleared"]);
   await redisCommand(["SET", `record:${record.id}`, JSON.stringify(record)]);
   await redisCommand(["SADD", "cbse_student_record_ids", record.id]);
 }
 
 export async function deleteStudentRecord(id: string): Promise<boolean> {
   const store = getMemoryStore();
-  const deletedSet = getDeletedStore();
-
   store.delete(id);
-  deletedSet.add(id);
 
   // Local JSON disk persistence
   persistToDisk();
@@ -144,20 +135,15 @@ export async function deleteStudentRecord(id: string): Promise<boolean> {
   // Cloud KV persistence
   await redisCommand(["DEL", `record:${id}`]);
   await redisCommand(["SREM", "cbse_student_record_ids", id]);
-  await redisCommand(["SADD", "cbse_deleted_record_ids", id]);
 
   return true;
 }
 
 export async function clearAllStudentRecords(): Promise<boolean> {
   const store = getMemoryStore();
-  const deletedSet = getDeletedStore();
-
   store.clear();
-  globalThis.__pragatiStoreClearedAll = true;
-  BASELINE_ROSTER.forEach((rec) => deletedSet.add(rec.id));
 
-  // Local JSON disk persistence
+  // Local JSON disk persistence (persists empty array [] so it never resurrects)
   persistToDisk();
 
   // Cloud KV wipe
@@ -174,11 +160,7 @@ export async function clearAllStudentRecords(): Promise<boolean> {
 
 export async function resetToBaselineRoster(): Promise<boolean> {
   const store = getMemoryStore();
-  const deletedSet = getDeletedStore();
-
   store.clear();
-  deletedSet.clear();
-  globalThis.__pragatiStoreClearedAll = false;
   BASELINE_ROSTER.forEach((rec) => store.set(rec.id, rec));
 
   // Local JSON disk persistence
@@ -186,7 +168,6 @@ export async function resetToBaselineRoster(): Promise<boolean> {
 
   // Cloud KV reset
   await redisCommand(["DEL", "cbse_all_cleared"]);
-  await redisCommand(["DEL", "cbse_deleted_record_ids"]);
   for (const rec of BASELINE_ROSTER) {
     await redisCommand(["SET", `record:${rec.id}`, JSON.stringify(rec)]);
     await redisCommand(["SADD", "cbse_student_record_ids", rec.id]);
@@ -198,64 +179,34 @@ export async function resetToBaselineRoster(): Promise<boolean> {
 export async function getAllStudentRecords(): Promise<StudentPerformanceRecord[]> {
   loadFromDisk();
   const store = getMemoryStore();
-  const deletedSet = getDeletedStore();
-  const map = new Map<string, StudentPerformanceRecord>();
 
   // Cloud KV check for global cleared status
   const isClearedRemote = await redisCommand(["GET", "cbse_all_cleared"]);
   if (isClearedRemote) {
-    globalThis.__pragatiStoreClearedAll = true;
+    store.clear();
+    persistToDisk();
+    return [];
   }
 
-  // Cloud KV remote deleted sync
-  const remoteDeleted = await redisCommand(["SMEMBERS", "cbse_deleted_record_ids"]);
-  if (Array.isArray(remoteDeleted)) {
-    remoteDeleted.forEach((dId) => deletedSet.add(dId));
-  }
-
-  // Base roster (only if not cleared)
-  if (!globalThis.__pragatiStoreClearedAll) {
-    BASELINE_ROSTER.forEach((rec) => {
-      if (!deletedSet.has(rec.id)) {
-        map.set(rec.id, rec);
-      }
-    });
-  }
-
-  // In-memory records
-  store.forEach((rec) => {
-    if (!deletedSet.has(rec.id)) {
-      map.set(rec.id, rec);
-    }
-  });
-
-  // Cloud KV records (if available and not cleared)
-  if (!globalThis.__pragatiStoreClearedAll) {
-    const remoteIds = await redisCommand(["SMEMBERS", "cbse_student_record_ids"]);
-    if (Array.isArray(remoteIds) && remoteIds.length > 0) {
-      const activeIds = remoteIds.filter((id) => !deletedSet.has(id));
-      if (activeIds.length > 0) {
-        const keys = activeIds.map((id) => `record:${id}`);
-        const remoteData = await redisCommand(["MGET", ...keys]);
-        if (Array.isArray(remoteData)) {
-          remoteData.forEach((raw) => {
-            if (raw) {
-              try {
-                const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-                if (parsed && parsed.id && !deletedSet.has(parsed.id)) {
-                  map.set(parsed.id, parsed);
-                  store.set(parsed.id, parsed);
-                }
-              } catch {}
+  // Cloud KV records sync (if configured)
+  const remoteIds = await redisCommand(["SMEMBERS", "cbse_student_record_ids"]);
+  if (Array.isArray(remoteIds) && remoteIds.length > 0) {
+    const keys = remoteIds.map((id) => `record:${id}`);
+    const remoteData = await redisCommand(["MGET", ...keys]);
+    if (Array.isArray(remoteData)) {
+      remoteData.forEach((raw) => {
+        if (raw) {
+          try {
+            const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+            if (parsed && parsed.id) {
+              store.set(parsed.id, parsed);
             }
-          });
+          } catch {}
         }
-      }
+      });
+      persistToDisk();
     }
   }
 
-  // Final guarantee: strip any marked deleted
-  deletedSet.forEach((dId) => map.delete(dId));
-
-  return Array.from(map.values());
+  return Array.from(store.values());
 }
