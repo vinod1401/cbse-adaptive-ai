@@ -6,6 +6,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import {
   APERTURE,
   FOCAL_LENGTH,
+  MODE_LABELS,
   OBJECT_HEIGHT,
   OpticMode,
   Point2,
@@ -65,20 +66,36 @@ function arrow(x: number, height: number, color: string, opacity = 1) {
   return group;
 }
 
-function label(text: string, color: string) {
+/** Text sprite; an optional smaller second line holds the full English term. */
+function label(text: string, color: string, sub?: string) {
   const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 128;
   const ctx = canvas.getContext("2d")!;
-  ctx.font = "bold 64px sans-serif";
+  const mainFont = "bold 64px sans-serif";
+  const subFont = "600 46px sans-serif";
+  ctx.font = mainFont;
+  let width = ctx.measureText(text).width;
+  if (sub) {
+    ctx.font = subFont;
+    width = Math.max(width, ctx.measureText(sub).width);
+  }
+  canvas.width = Math.ceil(width + 24);
+  canvas.height = sub ? 140 : 84;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = color;
-  ctx.fillText(text, 128, 64);
+  ctx.font = mainFont;
+  ctx.fillText(text, canvas.width / 2, sub ? 40 : 42);
+  if (sub) {
+    ctx.font = subFont;
+    ctx.globalAlpha = 0.8;
+    ctx.fillText(sub, canvas.width / 2, 108);
+  }
   const sprite = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), depthTest: false, transparent: true })
   );
-  sprite.scale.set(6, 3, 1);
+  // 64px of text ≈ 2.2 scene units tall.
+  const unit = 2.2 / 64;
+  sprite.scale.set(canvas.width * unit, canvas.height * unit, 1);
   sprite.renderOrder = 10;
   return sprite;
 }
@@ -256,30 +273,36 @@ export function LightLab3D({ mode, objectDistance, showPhotons }: LightLab3DProp
 
     // Axis markers: P/F/C for mirrors, O/F₁/F₂/2F₁/2F₂ for lenses.
     const F = FOCAL_LENGTH;
-    const marks: [number, string][] = res.isMirror
+    const marks: [number, string, string][] = res.isMirror
       ? [
-          [0, "P"],
-          [-res.f, "F"],
-          [-2 * res.f, "C"],
+          [0, "P", "Pole"],
+          [-res.f, "F", "Focus"],
+          [-2 * res.f, "C", "Centre of Curvature"],
         ]
       : [
-          [0, "O"],
-          [-F, "F₁"],
-          [F, "F₂"],
-          [-2 * F, "2F₁"],
-          [2 * F, "2F₂"],
+          [0, "O", "Optical Centre"],
+          [-F, "F₁", "Focus"],
+          [F, "F₂", "Focus"],
+          [-2 * F, "2F₁", ""],
+          [2 * F, "2F₂", ""],
         ];
-    for (const [x, text] of marks) {
+    for (const [x, text, term] of marks) {
       const dot = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), new THREE.MeshBasicMaterial({ color: "#e2e8f0" }));
       dot.position.x = x;
-      const tag = label(text, "#cbd5e1");
-      tag.position.set(x, -2.6, 0);
+      const tag = label(text, "#cbd5e1", term || undefined);
+      tag.position.set(x, term ? -3.6 : -2.6, 0);
       g.add(dot, tag);
     }
 
+    const elementTag = label(MODE_LABELS[mode].en, "#e2e8f0");
+    elementTag.position.set(0, APERTURE + 3, 0);
+    const axisTag = label("Principal Axis", "#94a3b8");
+    axisTag.position.set(-68, 1.8, 0);
+    g.add(elementTag, axisTag);
+
     // Object (orange arrow).
     g.add(arrow(-objectDistance, OBJECT_HEIGHT, "#fb923c"));
-    const objTag = label("वस्तु", "#fdba74");
+    const objTag = label("Object", "#fdba74");
     objTag.position.set(-objectDistance, OBJECT_HEIGHT + 3, 0);
     g.add(objTag);
 
@@ -289,7 +312,7 @@ export function LightLab3D({ mode, objectDistance, showPhotons }: LightLab3DProp
     if (showImage) {
       const color = res.real ? "#34d399" : "#c084fc";
       g.add(arrow(res.imageX, res.imageHeight, color, res.real ? 1 : 0.55));
-      const imgTag = label("प्रतिबिंब", color);
+      const imgTag = label(res.real ? "Real Image" : "Virtual Image", color);
       imgTag.position.set(res.imageX, res.imageHeight + Math.sign(res.imageHeight || 1) * 3, 0);
       g.add(imgTag);
     }
