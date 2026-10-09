@@ -436,6 +436,27 @@ export const TOPICS_METADATA: ConceptTopic[] = [
     "color": "violet",
     "microTheory": "Ratio $a:b=\\\\frac{a}{b}$. Proportion: $a:b=c:d \\\\Rightarrow ad=bc$. **Direct variation**: $\\\\frac{x}{y}=k$ (constant). **Inverse variation**: $xy=k$ (constant). One day's work $=\\\\frac{1}{\\\\text{days to finish}}$.",
     "itemCount": 20
+  },
+  {
+    "id": "light-mirrors",
+    "subject": "Science",
+    "chapter": "Chapter 10: Light: Mirrors and Lenses",
+    "title": "Light: Mirrors, Reflection & Lenses",
+    "subtopics": [
+      "Concave & Convex Mirrors",
+      "Image Formation by Spherical Mirrors",
+      "Uses of Spherical Mirrors",
+      "Reflection of Light & Key Terms",
+      "Laws of Reflection",
+      "Converging & Diverging Mirrors",
+      "Convex & Concave Lenses",
+      "Uses of Lenses & Magnifying Glass"
+    ],
+    "description": "Concave and convex mirrors, laws of reflection, converging and diverging mirrors and lenses, image formation and everyday uses of mirrors and lenses.",
+    "icon": "Zap",
+    "color": "amber",
+    "microTheory": "A **spherical mirror** is part of a hollow sphere. **Concave** (bent inward) can form real/inverted or virtual/erect/enlarged images depending on object position. **Convex** (bulging outward) always forms virtual, erect, diminished images. **Plane mirror**: erect, same size, virtual, laterally inverted. **Laws of reflection**: (1) incident ray, reflected ray and normal lie in the same plane; (2) $\\angle i = \\angle r$, both measured from the normal. **Concave mirror** = converging mirror, **convex mirror** = diverging mirror. A **lens** refracts (bends) light. **Convex lens** (thick in the middle) = converging lens: real images, or virtual/erect/enlarged when the object is very close (magnifying glass). **Concave lens** (thin in the middle) = diverging lens: always virtual, erect, diminished; used for short-sightedness (myopia).",
+    "itemCount": 35
   }
 ];
 

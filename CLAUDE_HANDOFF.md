@@ -368,7 +368,7 @@ interface StudentPerformanceRecord {
 
 ---
 
-## 16. CURRENT TOPICS (24 total as of Oct 2026)
+## 16. CURRENT TOPICS (25 total as of Oct 2026)
 
 ### Mathematics (6 topics)
 - `rational-numbers` — Ch.1: Operations on Rational Numbers (17 items)
@@ -378,11 +378,12 @@ interface StudentPerformanceRecord {
 - `algebraic-identities` — Ch.9: Standard Algebraic Identities (17 items)
 - `ratio-proportion` — Ch.8: Ratio, Proportion & Direct/Inverse Variation (20 items)
 
-### Science (3 topics)
+### Science (5 topics)
 - `crop-production` — Ch.1: Agricultural Practices & Soil Management (17 items)
 - `microorganisms` — Ch.2: Microbial World & Disease Pathogens (17 items)
 - `force-pressure` — Ch.11: Forces, Pressure & Hydraulics (17 items)
 - `sound-vibrations` — Ch.13: Vibrations, Pitch, Amplitude (17 items)
+- `light-mirrors` — Ch.10: Light: Mirrors, Reflection & Lenses (35 items)
 
 ### English (2 topics)
 - `english-tenses` — Grammar: Tenses & Aspects (17 items)

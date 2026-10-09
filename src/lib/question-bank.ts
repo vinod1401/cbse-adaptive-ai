@@ -7921,7 +7921,654 @@ export const CONCEPT_BANK: ConceptTopic[] = [
       }
     }
   ]
-}
+},
+  {
+    "id": "light-mirrors",
+    "subject": "Science",
+    "chapter": "Chapter 10: Light: Mirrors and Lenses",
+    "title": "Light: Mirrors, Reflection & Lenses",
+    "subtopics": [
+      "Concave & Convex Mirrors",
+      "Image Formation by Spherical Mirrors",
+      "Uses of Spherical Mirrors",
+      "Reflection of Light & Key Terms",
+      "Laws of Reflection",
+      "Converging & Diverging Mirrors",
+      "Convex & Concave Lenses",
+      "Uses of Lenses & Magnifying Glass"
+    ],
+    "description": "Concave and convex mirrors, laws of reflection, converging and diverging mirrors and lenses, image formation and everyday uses of mirrors and lenses.",
+    "icon": "Zap",
+    "color": "amber",
+    "microTheory": "A **spherical mirror** is part of a hollow sphere. **Concave** (bent inward) can form real/inverted or virtual/erect/enlarged images depending on object position. **Convex** (bulging outward) always forms virtual, erect, diminished images. **Plane mirror**: erect, same size, virtual, laterally inverted. **Laws of reflection**: (1) incident ray, reflected ray and normal lie in the same plane; (2) $\\angle i = \\angle r$, both measured from the normal. **Concave mirror** = converging mirror, **convex mirror** = diverging mirror. A **lens** refracts (bends) light. **Convex lens** (thick in the middle) = converging lens: real images, or virtual/erect/enlarged when the object is very close (magnifying glass). **Concave lens** (thin in the middle) = diverging lens: always virtual, erect, diminished; used for short-sightedness (myopia).",
+    "items": [
+      {
+        "id": "sci-lm-1",
+        "topicId": "light-mirrors",
+        "difficulty": -2.3,
+        "text": "What type of spherical mirror has a reflecting surface that is 'bent inward'?",
+        "options": [
+          "Concave mirror",
+          "Convex mirror",
+          "Plane mirror",
+          "Cylindrical mirror"
+        ],
+        "correctAnswer": "Concave mirror",
+        "explanation": "A mirror whose reflecting surface is curved inward (like the inside of a spoon) is a concave mirror.",
+        "misconceptions": {
+          "Convex mirror": "A convex mirror's reflecting surface bulges outward, not inward.",
+          "Plane mirror": "A plane mirror has a flat surface, not a curved one."
+        }
+      },
+      {
+        "id": "sci-lm-2",
+        "topicId": "light-mirrors",
+        "difficulty": -2.2,
+        "text": "Which side of a shining steel spoon acts as a convex mirror?",
+        "options": [
+          "The back (outer) side",
+          "The front (inner) side",
+          "Both sides",
+          "Neither side"
+        ],
+        "correctAnswer": "The back (outer) side",
+        "explanation": "The back of the spoon bulges outward, so it behaves like a convex mirror.",
+        "misconceptions": {
+          "The front (inner) side": "The front side is bent inward, so it acts as a concave mirror.",
+          "Both sides": "The two sides curve in opposite directions, so they act as different mirrors."
+        }
+      },
+      {
+        "id": "sci-lm-3",
+        "topicId": "light-mirrors",
+        "difficulty": -2.0,
+        "text": "Rebouncing of light from a surface is called:",
+        "options": [
+          "Reflection of light",
+          "Refraction of light",
+          "Absorption of light",
+          "Dispersion of light"
+        ],
+        "correctAnswer": "Reflection of light",
+        "explanation": "When light falls on a surface and bounces back, it is called reflection of light.",
+        "misconceptions": {
+          "Refraction of light": "Refraction is bending of light when it passes from one medium to another.",
+          "Absorption of light": "In absorption the light is taken in by the surface, not bounced back."
+        }
+      },
+      {
+        "id": "sci-lm-4",
+        "topicId": "light-mirrors",
+        "difficulty": -1.8,
+        "text": "Which mirror is used as a rear-view mirror in cars and scooters?",
+        "options": [
+          "Convex mirror",
+          "Concave mirror",
+          "Plane mirror",
+          "Any curved mirror"
+        ],
+        "correctAnswer": "Convex mirror",
+        "explanation": "Convex mirrors form erect, small images and give a wider field of view, so more traffic behind can be seen.",
+        "misconceptions": {
+          "Concave mirror": "Concave mirrors can form inverted images of distant objects, which would be confusing for a driver.",
+          "Plane mirror": "A plane mirror gives a much narrower field of view than a convex mirror of the same size."
+        }
+      },
+      {
+        "id": "sci-lm-5",
+        "topicId": "light-mirrors",
+        "difficulty": -1.6,
+        "text": "A spherical mirror is a part of a:",
+        "options": [
+          "Hollow sphere",
+          "Solid cube",
+          "Flat glass sheet",
+          "Cylinder"
+        ],
+        "correctAnswer": "Hollow sphere",
+        "explanation": "A spherical mirror's reflecting surface forms a part of a hollow sphere of glass.",
+        "misconceptions": {
+          "Flat glass sheet": "A flat glass sheet gives a plane mirror, not a spherical mirror."
+        }
+      },
+      {
+        "id": "sci-lm-6",
+        "topicId": "light-mirrors",
+        "difficulty": -1.4,
+        "text": "The angle of incidence is the angle between:",
+        "options": [
+          "The incident ray and the normal",
+          "The incident ray and the mirror surface",
+          "The incident ray and the reflected ray",
+          "The reflected ray and the normal"
+        ],
+        "correctAnswer": "The incident ray and the normal",
+        "explanation": "Angle of incidence (∠i) is measured from the normal, not from the mirror surface.",
+        "misconceptions": {
+          "The incident ray and the mirror surface": "This is a common mistake — angles in reflection are always measured from the normal.",
+          "The reflected ray and the normal": "That is the angle of reflection (∠r)."
+        }
+      },
+      {
+        "id": "sci-lm-7",
+        "topicId": "light-mirrors",
+        "difficulty": -1.2,
+        "text": "Which type of mirror do dentists use to see enlarged images of teeth?",
+        "options": [
+          "Concave mirror",
+          "Convex mirror",
+          "Plane mirror",
+          "Cylindrical mirror"
+        ],
+        "correctAnswer": "Concave mirror",
+        "explanation": "When a tooth is close to a small concave mirror, an enlarged, erect image is seen, making defects easy to locate.",
+        "misconceptions": {
+          "Convex mirror": "A convex mirror always gives diminished images, which would make teeth look smaller.",
+          "Plane mirror": "A plane mirror gives a same-size image, not an enlarged one."
+        }
+      },
+      {
+        "id": "sci-lm-8",
+        "topicId": "light-mirrors",
+        "difficulty": -1.0,
+        "text": "In a convex mirror, which surface is silvered (coated)?",
+        "options": [
+          "The inner curved surface",
+          "The outer bulging surface",
+          "Both surfaces",
+          "No surface is coated"
+        ],
+        "correctAnswer": "The inner curved surface",
+        "explanation": "In a convex mirror the inner surface is silvered, so the outer bulging surface acts as the reflecting surface.",
+        "misconceptions": {
+          "The outer bulging surface": "That is the case for a concave mirror — its outer surface is silvered so the inner surface reflects."
+        }
+      },
+      {
+        "id": "sci-lm-9",
+        "topicId": "light-mirrors",
+        "difficulty": -0.7,
+        "text": "The normal at the point of incidence is drawn:",
+        "options": [
+          "Perpendicular (90°) to the mirror surface",
+          "Parallel to the mirror surface",
+          "Along the incident ray",
+          "At 45° to the mirror"
+        ],
+        "correctAnswer": "Perpendicular (90°) to the mirror surface",
+        "explanation": "The normal is an imaginary line drawn perpendicular to the mirror surface at the point of incidence.",
+        "misconceptions": {
+          "Parallel to the mirror surface": "A line parallel to the mirror would lie along the mirror, not perpendicular to it.",
+          "At 45° to the mirror": "The normal always makes 90° with the mirror surface."
+        }
+      },
+      {
+        "id": "sci-lm-10",
+        "topicId": "light-mirrors",
+        "difficulty": -0.5,
+        "text": "If the angle of incidence is 35°, what is the angle of reflection?",
+        "options": [
+          "35°",
+          "55°",
+          "70°",
+          "145°"
+        ],
+        "correctAnswer": "35°",
+        "explanation": "By the second law of reflection, ∠r = ∠i, so the angle of reflection is 35°.",
+        "misconceptions": {
+          "55°": "55° is 90° − 35°, the angle with the mirror surface — but angles are measured from the normal.",
+          "70°": "70° is the angle between the incident and reflected rays (35° + 35°), not the angle of reflection."
+        }
+      },
+      {
+        "id": "sci-lm-11",
+        "topicId": "light-mirrors",
+        "difficulty": -0.3,
+        "text": "Why are concave mirrors used as shaving and make-up mirrors?",
+        "options": [
+          "They give an enlarged, erect image when the face is close",
+          "They always give a diminished image",
+          "They give a wider field of view",
+          "They form an inverted image of the face"
+        ],
+        "correctAnswer": "They give an enlarged, erect image when the face is close",
+        "explanation": "When the face is held close to a concave mirror, its image is erect and enlarged, which helps see fine details.",
+        "misconceptions": {
+          "They give a wider field of view": "A wide field of view is the property of a convex mirror.",
+          "They form an inverted image of the face": "An inverted image forms only when the object is far away — it would not be useful for shaving."
+        }
+      },
+      {
+        "id": "sci-lm-12",
+        "topicId": "light-mirrors",
+        "difficulty": 0.0,
+        "text": "What is a virtual image?",
+        "options": [
+          "An image that cannot be obtained on a screen",
+          "An image that is always inverted",
+          "An image formed only by concave mirrors",
+          "An image that is always larger than the object"
+        ],
+        "correctAnswer": "An image that cannot be obtained on a screen",
+        "explanation": "A virtual image appears to be behind the mirror and cannot be projected on a screen.",
+        "misconceptions": {
+          "An image that is always inverted": "Virtual images formed by mirrors are erect; real images are inverted.",
+          "An image formed only by concave mirrors": "Plane and convex mirrors also form virtual images."
+        }
+      },
+      {
+        "id": "sci-lm-13",
+        "topicId": "light-mirrors",
+        "difficulty": 0.2,
+        "text": "Why can we NOT see our image in a wall or a sheet of paper, even though they reflect light?",
+        "options": [
+          "Their surfaces are rough/unpolished",
+          "They absorb all light",
+          "They are luminous objects",
+          "They are transparent"
+        ],
+        "correctAnswer": "Their surfaces are rough/unpolished",
+        "explanation": "Unpolished surfaces reflect light in many directions, so no clear image forms. Smooth, polished surfaces like mirrors form images.",
+        "misconceptions": {
+          "They absorb all light": "If they absorbed all light, we could not see them at all.",
+          "They are luminous objects": "Walls and paper are non-luminous — we see them only because they reflect light."
+        }
+      },
+      {
+        "id": "sci-lm-14",
+        "topicId": "light-mirrors",
+        "difficulty": 0.4,
+        "text": "Which statement about a convex mirror is ALWAYS true?",
+        "options": [
+          "It forms an erect, virtual and diminished image",
+          "It forms a real and inverted image",
+          "It forms an enlarged image when the object is close",
+          "It forms an image of the same size"
+        ],
+        "correctAnswer": "It forms an erect, virtual and diminished image",
+        "explanation": "No matter where the object is placed, a convex mirror always forms an erect, virtual and diminished image.",
+        "misconceptions": {
+          "It forms an enlarged image when the object is close": "That describes a concave mirror. We can never get a magnified image with a convex mirror.",
+          "It forms an image of the same size": "A same-size image is formed by a plane mirror."
+        }
+      },
+      {
+        "id": "sci-lm-15",
+        "topicId": "light-mirrors",
+        "difficulty": 0.6,
+        "text": "A lighted bulb is placed at the focus of a concave mirror in a torch. What does the mirror produce?",
+        "options": [
+          "A strong, parallel beam of light",
+          "A scattered, weak light",
+          "A virtual image of the bulb",
+          "Light that converges back into the bulb"
+        ],
+        "correctAnswer": "A strong, parallel beam of light",
+        "explanation": "A bulb at the focus of a concave reflector gives a powerful parallel beam — used in torches, headlights and searchlights.",
+        "misconceptions": {
+          "A scattered, weak light": "Concave reflectors concentrate light; they do not scatter it.",
+          "A virtual image of the bulb": "The purpose of the reflector is to send light out as a beam, not to form an image."
+        }
+      },
+      {
+        "id": "sci-lm-16",
+        "topicId": "light-mirrors",
+        "difficulty": 0.9,
+        "text": "The first law of reflection states that:",
+        "options": [
+          "The incident ray, the reflected ray and the normal all lie in the same plane",
+          "The angle of incidence equals the angle of reflection",
+          "Light always travels in a straight line",
+          "The reflected ray is perpendicular to the mirror"
+        ],
+        "correctAnswer": "The incident ray, the reflected ray and the normal all lie in the same plane",
+        "explanation": "The first law: incident ray, reflected ray and normal at the point of incidence lie in the same plane.",
+        "misconceptions": {
+          "The angle of incidence equals the angle of reflection": "That is the second law of reflection.",
+          "Light always travels in a straight line": "That is rectilinear propagation of light, not a law of reflection."
+        }
+      },
+      {
+        "id": "sci-lm-17",
+        "topicId": "light-mirrors",
+        "difficulty": 1.2,
+        "text": "A ray of light strikes a plane mirror making an angle of 30° with the mirror surface. What is the angle of reflection?",
+        "options": [
+          "60°",
+          "30°",
+          "90°",
+          "120°"
+        ],
+        "correctAnswer": "60°",
+        "explanation": "The angle with the normal is 90° − 30° = 60°. So ∠i = 60° and ∠r = 60°.",
+        "misconceptions": {
+          "30°": "30° is the angle with the mirror surface, but angles must be measured from the normal.",
+          "120°": "120° is the angle between incident and reflected rays (60° + 60°)."
+        }
+      },
+      {
+        "id": "sci-lm-18",
+        "topicId": "light-mirrors",
+        "difficulty": 1.5,
+        "text": "A concave mirror is used in a solar cooker. What kind of image of the Sun does it form?",
+        "options": [
+          "Very small, real and inverted",
+          "Large, erect and virtual",
+          "Same size and erect",
+          "Large, real and erect"
+        ],
+        "correctAnswer": "Very small, real and inverted",
+        "explanation": "The Sun is very far away, so the concave mirror focuses its rays to a point, forming a very small, real and inverted image.",
+        "misconceptions": {
+          "Large, erect and virtual": "This happens only when the object is very close to a concave mirror, not for the distant Sun.",
+          "Large, real and erect": "Real images formed by mirrors are always inverted, never erect."
+        }
+      },
+      {
+        "id": "sci-lm-19",
+        "topicId": "light-mirrors",
+        "difficulty": 1.8,
+        "text": "A ray of light falls on a plane mirror along the normal (angle of incidence = 0°). What happens to the reflected ray?",
+        "options": [
+          "It retraces its path back along the normal",
+          "It moves along the mirror surface",
+          "It reflects at 90°",
+          "It is absorbed by the mirror"
+        ],
+        "correctAnswer": "It retraces its path back along the normal",
+        "explanation": "Since ∠i = 0°, ∠r = 0° as well — the ray goes back along the same path.",
+        "misconceptions": {
+          "It reflects at 90°": "∠r must equal ∠i, which is 0°, not 90°.",
+          "It moves along the mirror surface": "Moving along the surface means ∠r = 90°, which breaks the second law here."
+        }
+      },
+      {
+        "id": "sci-lm-20",
+        "topicId": "light-mirrors",
+        "difficulty": 2.2,
+        "text": "The angle between the incident ray and the reflected ray is 100°. What is the angle of incidence?",
+        "options": [
+          "50°",
+          "100°",
+          "40°",
+          "80°"
+        ],
+        "correctAnswer": "50°",
+        "explanation": "The normal divides the angle between the rays equally: ∠i + ∠r = 100° and ∠i = ∠r, so ∠i = 50°.",
+        "misconceptions": {
+          "100°": "100° is the total angle between both rays, not the angle of incidence.",
+          "40°": "40° is 90° − 50°, the angle with the mirror surface, not with the normal."
+        }
+      },
+      {
+        "id": "sci-lm-21",
+        "topicId": "light-mirrors",
+        "difficulty": -2.1,
+        "text": "Which lens is thicker in the middle than at the edges?",
+        "options": [
+          "Convex lens",
+          "Concave lens",
+          "Plano-concave lens",
+          "Biconcave lens"
+        ],
+        "correctAnswer": "Convex lens",
+        "explanation": "A convex lens bulges outward, so it is thicker in the middle and thinner at the edges.",
+        "misconceptions": {
+          "Concave lens": "A concave lens is thinner in the middle and thicker at the edges.",
+          "Biconcave lens": "Both surfaces of a biconcave lens curve inward, making it thin in the middle."
+        }
+      },
+      {
+        "id": "sci-lm-22",
+        "topicId": "light-mirrors",
+        "difficulty": -1.9,
+        "text": "Which of the following is necessary for us to see the objects around us?",
+        "options": [
+          "Both light and the sense of sight",
+          "Only light",
+          "Only the sense of sight",
+          "Neither light nor the sense of sight"
+        ],
+        "correctAnswer": "Both light and the sense of sight",
+        "explanation": "Light enters the eye and the brain identifies it as an image, so both light and the sense of sight are necessary.",
+        "misconceptions": {
+          "Only light": "Without the sense of sight, light alone cannot produce an image in the brain.",
+          "Only the sense of sight": "In complete darkness we cannot see anything, even with healthy eyes."
+        }
+      },
+      {
+        "id": "sci-lm-23",
+        "topicId": "light-mirrors",
+        "difficulty": -1.5,
+        "text": "What is the point where a concave mirror converges a parallel beam of light called?",
+        "options": [
+          "Focus",
+          "Pole",
+          "Centre of curvature",
+          "Aperture"
+        ],
+        "correctAnswer": "Focus",
+        "explanation": "Parallel rays reflected by a concave mirror meet at a single point in front of it, called the focus (F).",
+        "misconceptions": {
+          "Centre of curvature": "The centre of curvature is the centre of the sphere the mirror is part of, not where parallel rays meet.",
+          "Pole": "The pole is the centre point of the mirror's surface."
+        }
+      },
+      {
+        "id": "sci-lm-24",
+        "topicId": "light-mirrors",
+        "difficulty": -1.1,
+        "text": "A convex mirror is also known as a:",
+        "options": [
+          "Diverging mirror",
+          "Converging mirror",
+          "Plane mirror",
+          "Magnifying mirror"
+        ],
+        "correctAnswer": "Diverging mirror",
+        "explanation": "A convex mirror spreads out (diverges) parallel rays of light, so it is called a diverging mirror.",
+        "misconceptions": {
+          "Converging mirror": "Converging mirror is another name for a concave mirror.",
+          "Magnifying mirror": "A convex mirror never forms a magnified image."
+        }
+      },
+      {
+        "id": "sci-lm-25",
+        "topicId": "light-mirrors",
+        "difficulty": -0.9,
+        "text": "What happens to a parallel beam of light after it passes through a convex lens?",
+        "options": [
+          "It bends inward and meets at a point (converges)",
+          "It spreads out (diverges)",
+          "It passes without any change",
+          "It is reflected back"
+        ],
+        "correctAnswer": "It bends inward and meets at a point (converges)",
+        "explanation": "A convex lens bends parallel rays inward so they meet at the focus on the other side — it is a converging lens.",
+        "misconceptions": {
+          "It spreads out (diverges)": "Spreading out happens with a concave lens.",
+          "It passes without any change": "That happens with a thin glass plate, not a lens.",
+          "It is reflected back": "Lenses refract (bend) light passing through them; they do not reflect it back."
+        }
+      },
+      {
+        "id": "sci-lm-26",
+        "topicId": "light-mirrors",
+        "difficulty": -0.6,
+        "text": "What is the primary use of a concave lens in spectacles?",
+        "options": [
+          "To correct short-sightedness (myopia)",
+          "To correct long-sightedness",
+          "To magnify small objects",
+          "To concentrate sunlight"
+        ],
+        "correctAnswer": "To correct short-sightedness (myopia)",
+        "explanation": "A concave lens spreads light a little before it enters the eye, helping short-sighted people see distant objects clearly.",
+        "misconceptions": {
+          "To correct long-sightedness": "Convex lenses are prescribed for people who find it hard to read close-up letters.",
+          "To magnify small objects": "Magnifying is done by a convex lens."
+        }
+      },
+      {
+        "id": "sci-lm-27",
+        "topicId": "light-mirrors",
+        "difficulty": -0.2,
+        "text": "A lens works mainly by:",
+        "options": [
+          "Refracting (bending) light as it passes through",
+          "Reflecting light from its surface",
+          "Absorbing light",
+          "Producing its own light"
+        ],
+        "correctAnswer": "Refracting (bending) light as it passes through",
+        "explanation": "A lens is a piece of transparent material whose curved surfaces bend (refract) light rays passing through it.",
+        "misconceptions": {
+          "Reflecting light from its surface": "Reflection is how mirrors work, not lenses."
+        }
+      },
+      {
+        "id": "sci-lm-28",
+        "topicId": "light-mirrors",
+        "difficulty": 0.1,
+        "text": "Which type of lens is used in a magnifying glass?",
+        "options": [
+          "Convex lens",
+          "Concave lens",
+          "Plane glass",
+          "Plano-concave lens"
+        ],
+        "correctAnswer": "Convex lens",
+        "explanation": "When an object is very close to a convex lens (within its focus), it forms a virtual, erect and enlarged image.",
+        "misconceptions": {
+          "Concave lens": "A concave lens always forms a diminished image, so it cannot magnify."
+        }
+      },
+      {
+        "id": "sci-lm-29",
+        "topicId": "light-mirrors",
+        "difficulty": 0.3,
+        "text": "When parallel beams of light fall on a plane mirror, the reflected beams:",
+        "options": [
+          "Remain parallel to each other",
+          "Converge to a point",
+          "Spread out",
+          "Return along the same path"
+        ],
+        "correctAnswer": "Remain parallel to each other",
+        "explanation": "A plane mirror keeps parallel rays parallel after reflection, which is why its image is the same size as the object.",
+        "misconceptions": {
+          "Converge to a point": "Converging happens with a concave mirror.",
+          "Spread out": "Spreading out happens with a convex mirror."
+        }
+      },
+      {
+        "id": "sci-lm-30",
+        "topicId": "light-mirrors",
+        "difficulty": 0.7,
+        "text": "A convex lens forms a real, inverted and diminished image when the object is:",
+        "options": [
+          "Placed far from the lens",
+          "Placed very close to the lens, within its focus",
+          "Placed anywhere — it always forms this image",
+          "Touching the lens"
+        ],
+        "correctAnswer": "Placed far from the lens",
+        "explanation": "For a far object, a convex lens forms a real, inverted, diminished image — this is how a camera lens captures a photo.",
+        "misconceptions": {
+          "Placed very close to the lens, within its focus": "Then the image is virtual, erect and enlarged (magnifying glass).",
+          "Placed anywhere — it always forms this image": "Only a concave lens forms the same kind of image for every object position."
+        }
+      },
+      {
+        "id": "sci-lm-31",
+        "topicId": "light-mirrors",
+        "difficulty": 1.0,
+        "text": "Why is the small lens in a door peephole a concave lens?",
+        "options": [
+          "It gives a wide view of the outside, though people look smaller",
+          "It makes the visitor look bigger",
+          "It focuses sunlight into the house",
+          "It forms a real image on the door"
+        ],
+        "correctAnswer": "It gives a wide view of the outside, though people look smaller",
+        "explanation": "A concave lens makes things look smaller but lets the person inside see a much larger area outside.",
+        "misconceptions": {
+          "It makes the visitor look bigger": "A concave lens always forms diminished images, never enlarged ones.",
+          "It forms a real image on the door": "A concave lens forms only virtual images."
+        }
+      },
+      {
+        "id": "sci-lm-32",
+        "topicId": "light-mirrors",
+        "difficulty": 1.3,
+        "text": "Assertion (A): A concave mirror is used by dentists to examine teeth. Reason (R): A concave mirror is also known as a converging mirror. Choose the correct option.",
+        "options": [
+          "Both A and R are true, but R is not the correct explanation of A",
+          "Both A and R are true, and R is the correct explanation of A",
+          "A is true but R is false",
+          "A is false but R is true"
+        ],
+        "correctAnswer": "Both A and R are true, but R is not the correct explanation of A",
+        "explanation": "Both statements are true. But dentists use it because a tooth held close gives an enlarged, erect image — not because it converges light.",
+        "misconceptions": {
+          "Both A and R are true, and R is the correct explanation of A": "The reason for use is the enlarged image of a nearby tooth, not the converging property."
+        }
+      },
+      {
+        "id": "sci-lm-33",
+        "topicId": "light-mirrors",
+        "difficulty": 1.6,
+        "text": "Assertion (A): A concave lens converges parallel rays of light to a focus. Reason (R): A convex lens is a converging lens. Choose the correct option.",
+        "options": [
+          "A is false but R is true",
+          "A is true but R is false",
+          "Both A and R are true",
+          "Both A and R are false"
+        ],
+        "correctAnswer": "A is false but R is true",
+        "explanation": "A concave lens diverges light, so A is false. A convex lens converges light, so R is true.",
+        "misconceptions": {
+          "A is true but R is false": "It is the other way round: a concave lens diverges light, a convex lens converges it."
+        }
+      },
+      {
+        "id": "sci-lm-34",
+        "topicId": "light-mirrors",
+        "difficulty": 2.0,
+        "text": "A camper has no matches but has a clear plastic bottle filled with water. How can it help start a fire?",
+        "options": [
+          "The curved water-filled bottle acts like a convex lens and focuses sunlight on dry leaves",
+          "It acts like a concave lens and spreads sunlight",
+          "It acts like a plane mirror and reflects sunlight",
+          "It absorbs heat and releases it slowly"
+        ],
+        "correctAnswer": "The curved water-filled bottle acts like a convex lens and focuses sunlight on dry leaves",
+        "explanation": "A round bottle of water is thick in the middle like a convex lens, so it can converge sunlight to a hot, bright point.",
+        "misconceptions": {
+          "It acts like a concave lens and spreads sunlight": "Spreading out light would not concentrate heat to start a fire.",
+          "It acts like a plane mirror and reflects sunlight": "A plane mirror keeps rays parallel and cannot focus heat to a point."
+        }
+      },
+      {
+        "id": "sci-lm-35",
+        "topicId": "light-mirrors",
+        "difficulty": 2.4,
+        "text": "You want to find the approximate focal length of a convex lens using sunlight and a screen. What should you measure?",
+        "options": [
+          "The distance from the lens to the screen when the Sun's image is sharpest",
+          "The thickness of the lens",
+          "The distance from the Sun to the lens",
+          "The diameter of the bright spot"
+        ],
+        "correctAnswer": "The distance from the lens to the screen when the Sun's image is sharpest",
+        "explanation": "Sunlight is nearly parallel, so the sharp image of the Sun forms at the focus; the lens-to-screen distance is the focal length.",
+        "misconceptions": {
+          "The thickness of the lens": "Thickness does not directly give the focal length.",
+          "The diameter of the bright spot": "The spot is smallest at the focus, but its size is not the focal length."
+        }
+      }
+    ]
+  }
 ];
 
 export function getTopicById(id: string): ConceptTopic | undefined {
