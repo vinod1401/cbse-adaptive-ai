@@ -130,19 +130,19 @@ export function describeCase(mode: OpticMode, d: number): { object: string; imag
   const isMirror = mode.endsWith("mirror");
 
   if (mode === "convex-mirror") {
-    return { object: "दर्पण के सामने कहीं भी", image: "दर्पण के पीछे, P और F के बीच" };
+    return { object: "Anywhere in front of the mirror", image: "Behind the mirror, between P and F" };
   }
   if (mode === "concave-lens") {
-    return { object: "लेंस के सामने कहीं भी", image: "उसी ओर, F₁ और O के बीच" };
+    return { object: "Anywhere in front of the lens", image: "Same side as object, between F₁ and O" };
   }
 
   const [C1, C2, Fa, Fb, P] = isMirror ? ["C", "C", "F", "F", "P"] : ["2F₁", "2F₂", "F₁", "F₂", "O"];
-  if (near(d, 2 * F)) return { object: `${C1} पर`, image: `${C2} पर` };
-  if (d > 2 * F) return { object: `${C1} से परे`, image: `${Fb} और ${C2} के बीच` };
-  if (near(d, F)) return { object: `${Fa} पर`, image: "अनंत (infinity) पर" };
-  if (d > F) return { object: `${Fa} और ${C1} के बीच`, image: `${C2} से परे` };
+  if (near(d, 2 * F)) return { object: `At ${C1}`, image: `At ${C2}` };
+  if (d > 2 * F) return { object: `Beyond ${C1}`, image: `Between ${Fb} and ${C2}` };
+  if (near(d, F)) return { object: `At ${Fa}`, image: "At infinity" };
+  if (d > F) return { object: `Between ${Fa} and ${C1}`, image: `Beyond ${C2}` };
   return {
-    object: `${Fa} और ${P} के बीच`,
-    image: isMirror ? "दर्पण के पीछे" : "वस्तु की ओर ही (same side)",
+    object: `Between ${Fa} and ${P}`,
+    image: isMirror ? "Behind the mirror" : "Same side as the object",
   };
 }
