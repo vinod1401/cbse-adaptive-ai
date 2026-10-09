@@ -60,3 +60,8 @@ export function getTopicVideo(topicId: string, topicTitle?: string): TopicVideo 
 export function getYouTubeSearchUrl(query: string): string {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
+
+/** Interactive 3D labs available for a topic. */
+export const TOPIC_LABS: Record<string, string> = {
+  "light-mirrors": "/lab/light",
+};

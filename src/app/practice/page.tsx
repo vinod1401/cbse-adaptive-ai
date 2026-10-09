@@ -4,7 +4,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { MathRenderer } from "@/components/MathRenderer";
-import { TopicVideo } from "@/components/TopicVideo";
+import { TopicVideo, TopicLabLink } from "@/components/TopicVideo";
 import {
   Brain,
   CheckCircle2,
@@ -701,6 +701,7 @@ function PracticeContent() {
 
       {/* Topic Video Lesson */}
       <TopicVideo topicId={topicId} topicTitle={topicMeta?.title} />
+      <TopicLabLink topicId={topicId} />
 
       {/* Main Question Card - Anti-Cheat Protected against text selection & browser web search */}
       <div

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { PlayCircle, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
-import { getTopicVideo, getYouTubeSearchUrl, parseYouTubeId } from "@/lib/topic-videos";
+import Link from "next/link";
+import { PlayCircle, ExternalLink, ChevronDown, ChevronUp, Box } from "lucide-react";
+import { TOPIC_LABS, getTopicVideo, getYouTubeSearchUrl, parseYouTubeId } from "@/lib/topic-videos";
 
 interface TopicVideoProps {
   topicId: string;
@@ -60,5 +61,20 @@ export function TopicVideo({ topicId, topicTitle, defaultOpen = false }: TopicVi
         </div>
       )}
     </div>
+  );
+}
+
+/** Link to the topic's interactive 3D lab, if one exists. */
+export function TopicLabLink({ topicId }: { topicId: string }) {
+  const href = TOPIC_LABS[topicId];
+  if (!href) return null;
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-semibold border border-amber-500/30 transition-colors"
+    >
+      <Box className="w-4 h-4" />
+      <span>3D Lab में खुद करके देखें</span>
+    </Link>
   );
 }
