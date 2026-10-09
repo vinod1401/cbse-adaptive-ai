@@ -7636,6 +7636,291 @@ export const CONCEPT_BANK: ConceptTopic[] = [
       }
     }
   ]
+},
+{
+  "id": "ratio-proportion",
+  "subject": "Mathematics",
+  "chapter": "Chapter 8: Ratio and Proportion (Direct and Inverse Variation)",
+  "title": "Ratio, Proportion & Direct/Inverse Variation",
+  "subtopics": [
+    "Simplest Form of Ratio",
+    "Proportion & Cross Product Rule",
+    "Direct Variation",
+    "Inverse Variation",
+    "Time, Work & Unitary Method"
+  ],
+  "description": "Ratio simplification, proportion verification (cross product), direct variation (x/y=k), inverse variation (xy=k), and time-work problems.",
+  "icon": "Calculator",
+  "color": "violet",
+  "microTheory": "Ratio $a:b=\\\\frac{a}{b}$. Proportion: $a:b=c:d \\\\Rightarrow ad=bc$. **Direct variation**: $\\\\frac{x}{y}=k$ (constant). **Inverse variation**: $xy=k$ (constant). One day's work $=\\\\frac{1}{\\\\text{days to finish}}$.",
+  "items": [
+    {
+      "id": "rp-1",
+      "topicId": "ratio-proportion",
+      "difficulty": -2.2,
+      "text": "Express the ratio 168 : 280 in its simplest form.",
+      "options": ["5 : 3", "3 : 5", "6 : 10", "4 : 5"],
+      "correctAnswer": "3 : 5",
+      "explanation": "HCF(168, 280) = 56. So 168÷56 : 280÷56 = 3 : 5.",
+      "misconceptions": {
+        "5 : 3": "You reversed the ratio. 168:280 simplifies to 3:5, not 5:3.",
+        "6 : 10": "Divide by HCF=56, not just 28. 168÷56=3, 280÷56=5."
+      }
+    },
+    {
+      "id": "rp-2",
+      "topicId": "ratio-proportion",
+      "difficulty": -2.0,
+      "text": "Which of the following ratios is greater: 1:2 or 2:3?",
+      "options": ["1 : 2", "2 : 3", "Both are equal", "Cannot be compared"],
+      "correctAnswer": "2 : 3",
+      "explanation": "Convert to decimals: 1/2=0.5 and 2/3≈0.667. Since 0.667 > 0.5, ratio 2:3 is greater.",
+      "misconceptions": {
+        "1 : 2": "1/2=0.5 but 2/3≈0.667. So 2:3 is the bigger ratio."
+      }
+    },
+    {
+      "id": "rp-3",
+      "topicId": "ratio-proportion",
+      "difficulty": -1.8,
+      "text": "Two numbers are in ratio 3:4. Their sum is 63. The greater number is:",
+      "options": ["36", "27", "32", "45"],
+      "correctAnswer": "36",
+      "explanation": "Total parts = 3+4=7. Each part = 63÷7=9. Greater number = 4×9 = 36.",
+      "misconceptions": {
+        "27": "That's the smaller number (3×9=27). Greater = 4×9 = 36.",
+        "32": "32+31=63 but 32:31 ≠ 3:4. Correct: 36+27=63 with ratio 36:27=4:3. ✓"
+      }
+    },
+    {
+      "id": "rp-4",
+      "topicId": "ratio-proportion",
+      "difficulty": -1.5,
+      "text": "Are 2, 5, 6 and 15 in proportion?",
+      "options": [
+        "Yes — 2×15 = 5×6 = 30",
+        "No — 2×15 ≠ 5×6",
+        "Yes — because 2+15 = 5+6 = 17",
+        "Cannot be determined"
+      ],
+      "correctAnswer": "Yes — 2×15 = 5×6 = 30",
+      "explanation": "Cross product: extremes = 2×15=30, means = 5×6=30. Both equal, so they ARE in proportion.",
+      "misconceptions": {
+        "No — 2×15 ≠ 5×6": "Actually 2×15=30 AND 5×6=30. They ARE equal — so the numbers ARE in proportion!"
+      }
+    },
+    {
+      "id": "rp-5",
+      "topicId": "ratio-proportion",
+      "difficulty": -1.3,
+      "text": "If a, b, c and d are in proportion, then which of the following is correct?",
+      "options": ["ad = bc", "ab = cd", "ac = bd", "None of these"],
+      "correctAnswer": "ad = bc",
+      "explanation": "If a:b = c:d then by cross multiplication: a×d = b×c. This is the cross product (or cross multiplication) rule.",
+      "misconceptions": {
+        "ab = cd": "That would be ab=cd, which confuses extremes and means. Extremes are a and d, means are b and c: ad=bc.",
+        "ac = bd": "a and c are the first and third terms. Cross product uses extremes (a,d) and means (b,c): ad=bc."
+      }
+    },
+    {
+      "id": "rp-6",
+      "topicId": "ratio-proportion",
+      "difficulty": -1.1,
+      "text": "Map scale is 1:6000000. Distance between cities on map is 4 cm. Actual distance is:",
+      "options": ["240 km", "24 km", "2400 km", "60 km"],
+      "correctAnswer": "240 km",
+      "explanation": "Actual = 4×6000000 = 24000000 cm. Convert: 24000000 ÷ 100000 = 240 km.",
+      "misconceptions": {
+        "24 km": "24000000 ÷ 100000 = 240 km, not 24. Check your place values.",
+        "2400 km": "24000000 ÷ 100000 = 240. Not 2400."
+      }
+    },
+    {
+      "id": "rp-7",
+      "topicId": "ratio-proportion",
+      "difficulty": -0.9,
+      "text": "If 12 metres of wire costs ₹24, then the cost of 8 metres of wire is:",
+      "options": ["₹16", "₹20", "₹12", "₹18"],
+      "correctAnswer": "₹16",
+      "explanation": "Direct variation. Rate = 24÷12 = ₹2/m. Cost of 8 m = 8×2 = ₹16.",
+      "misconceptions": {
+        "₹20": "Rate = 24÷12 = ₹2/m. 8×₹2 = ₹16, not ₹20.",
+        "₹12": "That would be 6 metres (6×2=12). For 8 m: 8×2=₹16."
+      }
+    },
+    {
+      "id": "rp-8",
+      "topicId": "ratio-proportion",
+      "difficulty": -0.6,
+      "text": "2 kg of wheat costs ₹60. The cost of 12 kg wheat is:",
+      "options": ["₹360", "₹300", "₹320", "₹340"],
+      "correctAnswer": "₹360",
+      "explanation": "Direct variation. Rate = 60÷2 = ₹30/kg. Cost of 12 kg = 30×12 = ₹360.",
+      "misconceptions": {
+        "₹300": "300÷12=25 ≠ 30 (the rate). Rate=60÷2=30. 12×30=₹360.",
+        "₹320": "Check: 320÷12≈26.7 ≠ 30. Rate must stay constant: 12×30=₹360."
+      }
+    },
+    {
+      "id": "rp-9",
+      "topicId": "ratio-proportion",
+      "difficulty": -0.3,
+      "text": "A soft drink machine fills 1120 bottles in 7 hours. How many bottles will it fill in 6 hours?",
+      "options": ["960", "1020", "840", "1200"],
+      "correctAnswer": "960",
+      "explanation": "Direct variation: 7/1120 = 6/x → x = (1120×6)÷7 = 6720÷7 = 960.",
+      "misconceptions": {
+        "840": "840÷6=140/hr ≠ 160/hr. Rate = 1120÷7=160. 160×6=960.",
+        "1020": "1020÷6=170 ≠ 160. Correct: 1120×6÷7=960."
+      }
+    },
+    {
+      "id": "rp-10",
+      "topicId": "ratio-proportion",
+      "difficulty": 0.0,
+      "text": "Two quantities x and y are said to be in inverse variation if:",
+      "options": ["xy = k (constant)", "x/y = k (constant)", "x+y = k (constant)", "x-y = k (constant)"],
+      "correctAnswer": "xy = k (constant)",
+      "explanation": "In inverse variation, the PRODUCT xy is constant. As x increases, y decreases proportionally so their product stays fixed at k.",
+      "misconceptions": {
+        "x/y = k (constant)": "x/y=k means DIRECT variation. For inverse variation, the PRODUCT xy=k."
+      }
+    },
+    {
+      "id": "rp-11",
+      "topicId": "ratio-proportion",
+      "difficulty": 0.2,
+      "text": "If 10 men complete a work in 6 days, then 30 men complete the same work in:",
+      "options": ["2 days", "3 days", "4 days", "5 days"],
+      "correctAnswer": "2 days",
+      "explanation": "Inverse variation: m₁×d₁ = m₂×d₂ → 10×6 = 30×d → d = 60÷30 = 2 days.",
+      "misconceptions": {
+        "3 days": "30×3=90 ≠ 60. Use 10×6=30×d → d=2.",
+        "4 days": "More men → fewer days. 10×6=60=30×d → d=2 days."
+      }
+    },
+    {
+      "id": "rp-12",
+      "topicId": "ratio-proportion",
+      "difficulty": 0.4,
+      "text": "A car travels 80 km in 5 litres of petrol. Distance covered in 15 litres is:",
+      "options": ["240 km", "400 km", "200 km", "100 km"],
+      "correctAnswer": "240 km",
+      "explanation": "Direct variation: 80/5 = d/15 → d = 80×15÷5 = 240 km.",
+      "misconceptions": {
+        "400 km": "400 km needs 25 litres. For 15 litres: 80×15÷5=240 km.",
+        "200 km": "200÷15≈13.3 km/L ≠ 16 km/L. Rate=80÷5=16. 16×15=240 km."
+      }
+    },
+    {
+      "id": "rp-13",
+      "topicId": "ratio-proportion",
+      "difficulty": 0.6,
+      "text": "Enough food for 200 students for 20 days. If 50 more students join, food lasts:",
+      "options": ["16 days", "15 days", "17 days", "18 days"],
+      "correctAnswer": "16 days",
+      "explanation": "Inverse variation: 200×20 = 250×d → d = 4000÷250 = 16 days.",
+      "misconceptions": {
+        "15 days": "200×20=4000. New total=250. 4000÷250=16, not 15.",
+        "18 days": "More students → fewer days. 200×20=250×d → d=16."
+      }
+    },
+    {
+      "id": "rp-14",
+      "topicId": "ratio-proportion",
+      "difficulty": 0.8,
+      "text": "3 persons can paint a house in 8 days. How many days for 4 persons?",
+      "options": ["6 days", "5 days", "7 days", "10 days"],
+      "correctAnswer": "6 days",
+      "explanation": "Inverse variation: 3×8 = 4×d → d = 24÷4 = 6 days.",
+      "misconceptions": {
+        "5 days": "3×8=24. 24÷4=6, not 5.",
+        "7 days": "More painters → fewer days. 3×8=4×d → d=6 days."
+      }
+    },
+    {
+      "id": "rp-15",
+      "topicId": "ratio-proportion",
+      "difficulty": 1.0,
+      "text": "5 pipes fill a tank in 1 hour. 4 pipes will fill the same tank in:",
+      "options": ["75 minutes", "70 minutes", "65 minutes", "80 minutes"],
+      "correctAnswer": "75 minutes",
+      "explanation": "Inverse variation: 5×60 = 4×t → t = 300÷4 = 75 minutes.",
+      "misconceptions": {
+        "70 minutes": "5×60=300. 300÷4=75, not 70.",
+        "65 minutes": "Fewer pipes → more time. 5×60=4×t → t=75 minutes."
+      }
+    },
+    {
+      "id": "rp-16",
+      "topicId": "ratio-proportion",
+      "difficulty": 1.2,
+      "text": "Jyoti can knit a sweater in 4 hours. Meera takes 6 hours. Working together, time taken is:",
+      "options": ["2 hours 24 minutes", "5 hours", "3 hours", "2 hours"],
+      "correctAnswer": "2 hours 24 minutes",
+      "explanation": "Together per hour: 1/4 + 1/6 = 3/12 + 2/12 = 5/12. Time = 12/5 = 2.4 hours = 2 hours 24 minutes.",
+      "misconceptions": {
+        "5 hours": "Don't add times directly. Use work rates: 1/4+1/6=5/12/hr → time=12/5=2h 24min.",
+        "3 hours": "12/5 = 2.4 hours = 2 hours 24 minutes, not 3 hours."
+      }
+    },
+    {
+      "id": "rp-17",
+      "topicId": "ratio-proportion",
+      "difficulty": 1.4,
+      "text": "A and B together can build a wall in 30 days. A is twice as good a workman as B. A alone will finish in:",
+      "options": ["45 days", "60 days", "40 days", "30 days"],
+      "correctAnswer": "45 days",
+      "explanation": "Let B's daily work = x, so A's = 2x. Together: 3x = 1/30 → x = 1/90. A alone: 1/(2x) = 1/(2/90) = 45 days.",
+      "misconceptions": {
+        "60 days": "A is faster (twice as good). A alone takes fewer days. A = 45 days, B = 90 days.",
+        "40 days": "Check: 1/45 + 1/90 = 2/90+1/90 = 3/90 = 1/30. ✓ So A takes 45 days."
+      }
+    },
+    {
+      "id": "rp-18",
+      "topicId": "ratio-proportion",
+      "difficulty": 1.6,
+      "text": "Sheetal buys 5 kg mangoes at ₹72/kg. If price increases to ₹80/kg, how many kg can she buy?",
+      "options": ["4.5 kg", "4 kg", "5.5 kg", "6 kg"],
+      "correctAnswer": "4.5 kg",
+      "explanation": "Total money = 5×72 = ₹360. Inverse variation: 5×72 = x×80 → x = 360÷80 = 4.5 kg.",
+      "misconceptions": {
+        "4 kg": "4×80=320 ≠ 360. She has ₹360. 360÷80=4.5 kg.",
+        "6 kg": "Higher price → fewer kg (inverse). 360÷80=4.5 kg."
+      }
+    },
+    {
+      "id": "rp-19",
+      "topicId": "ratio-proportion",
+      "difficulty": 1.8,
+      "text": "A hostel had rations for 150 students for 60 days. After 12 days, 30 more students join. Remaining rations last:",
+      "options": ["40 days", "48 days", "36 days", "30 days"],
+      "correctAnswer": "40 days",
+      "explanation": "Remaining food after 12 days = 150×(60-12) = 150×48 = 7200 units. New strength = 180. Days = 7200÷180 = 40 days.",
+      "misconceptions": {
+        "48 days": "That's remaining days for 150 students. But now 180 students: 7200÷180=40 days.",
+        "36 days": "180×36=6480 ≠ 7200. Remaining rations = 150×48=7200. 7200÷180=40."
+      }
+    },
+    {
+      "id": "rp-20",
+      "topicId": "ratio-proportion",
+      "difficulty": 2.1,
+      "text": "Observe: x=50,40,30,20 and y=5,6,7,8. Check if x and y are in inverse variation.",
+      "options": [
+        "No — xy is not constant (50×5=250 ≠ 40×6=240)",
+        "Yes — xy=250 throughout",
+        "Yes — as x decreases, y increases",
+        "Cannot determine"
+      ],
+      "correctAnswer": "No — xy is not constant (50×5=250 ≠ 40×6=240)",
+      "explanation": "50×5=250, 40×6=240, 30×7=210, 20×8=160. Products differ → NOT inverse variation.",
+      "misconceptions": {
+        "Yes — as x decreases, y increases": "Inverse variation needs xy=constant. Just because x↓ and y↑ is NOT enough — the products must all be equal. Here they differ."
+      }
+    }
+  ]
 }
 ];
 

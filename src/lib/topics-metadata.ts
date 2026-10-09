@@ -418,6 +418,24 @@ export const TOPICS_METADATA: ConceptTopic[] = [
     "color": "amber",
     "microTheory": "Colonialism established foreign resource exploitation and political subjugation. The Portuguese (1498) introduced the Cartaz permit system, resisted by Rani Abbakka of Ullal. Travancore's King Marthanda Varma defeated the Dutch in the 1741 Battle of Colachel. Dupleix trained Indian sepoys and meddled in succession disputes. Victory at Plassey (1757) began British territorial rule, expanded via Subsidiary Alliance and Doctrine of Lapse. British policies caused de-industrialization, massive Drain of Wealth (Dadabhai Naoroji, Utsa Patnaik's $45T calculation), and catastrophic famines (1770 Bengal, 1876 Deccan). In education, Macaulay's 1835 Minute established English dominance. Widespread grievances led to tribal uprisings (Kol, Santhal), the Indigo Revolt, and the 1857 Great Rebellion led by Mangal Pandey, Rani Lakshmibai, and Nana Saheb, resulting in Crown rule in 1858.",
     "itemCount": 32
+  },
+  {
+    "id": "ratio-proportion",
+    "subject": "Mathematics",
+    "chapter": "Chapter 8: Ratio and Proportion (Direct and Inverse Variation)",
+    "title": "Ratio, Proportion & Direct/Inverse Variation",
+    "subtopics": [
+      "Simplest Form of Ratio",
+      "Proportion & Cross Product Rule",
+      "Direct Variation",
+      "Inverse Variation",
+      "Time, Work & Unitary Method"
+    ],
+    "description": "Ratio simplification, proportion verification (cross product), direct variation (x/y=k), inverse variation (xy=k), and time-work problems.",
+    "icon": "Calculator",
+    "color": "violet",
+    "microTheory": "Ratio $a:b=\\\\frac{a}{b}$. Proportion: $a:b=c:d \\\\Rightarrow ad=bc$. **Direct variation**: $\\\\frac{x}{y}=k$ (constant). **Inverse variation**: $xy=k$ (constant). One day's work $=\\\\frac{1}{\\\\text{days to finish}}$.",
+    "itemCount": 20
   }
 ];
 
