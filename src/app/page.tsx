@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getAllTopics, getSubjects, getTopicsBySubject, ConceptTopic } from "@/lib/topics-metadata";
 import { thetaToMasteryPercentage, getMasteryTier } from "@/lib/irt-engine";
 import { MathRenderer } from "@/components/MathRenderer";
+import { TopicVideo } from "@/components/TopicVideo";
 import { getSavedStudentProfile, StudentProfile } from "@/lib/student-session";
 import {
   Brain,
@@ -240,6 +241,8 @@ export default function HomePage() {
                       <span className="text-slate-400 font-medium">Question Bank:</span>
                       <span className="text-indigo-400 font-mono font-bold">{topic.itemCount || 17} Calibrated Items</span>
                     </div>
+
+                    <TopicVideo topicId={topic.id} topicTitle={topic.title} />
 
                     <Link
                       href={`/practice?topic=${topic.id}`}
