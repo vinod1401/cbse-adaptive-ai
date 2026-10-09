@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getAllTopics, getSubjects, getTopicsBySubject, ConceptTopic } from "@/lib/topics-metadata";
 import { thetaToMasteryPercentage, getMasteryTier } from "@/lib/irt-engine";
 import { MathRenderer } from "@/components/MathRenderer";
-import { TopicVideo } from "@/components/TopicVideo";
+import { TopicVideo, TopicLabLink } from "@/components/TopicVideo";
 import { getSavedStudentProfile, StudentProfile } from "@/lib/student-session";
 import {
   Brain,
@@ -243,6 +243,7 @@ export default function HomePage() {
                     </div>
 
                     <TopicVideo topicId={topic.id} topicTitle={topic.title} />
+                    <TopicLabLink topicId={topic.id} />
 
                     <Link
                       href={`/practice?topic=${topic.id}`}
