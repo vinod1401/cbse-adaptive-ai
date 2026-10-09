@@ -117,7 +117,7 @@ export default function LightLabPage() {
       <div className="relative rounded-2xl border border-slate-800 bg-slate-950">
         <LightLab3D mode={mode} objectDistance={distance} showPhotons={showPhotons} />
         <div className="absolute top-3 left-3 flex items-center gap-1.5 text-[11px] text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-lg pointer-events-none">
-          <Hand className="w-3.5 h-3.5" /> खींचकर घुमाएँ · scroll से zoom
+          <Hand className="w-3.5 h-3.5" /> Drag to rotate · Scroll to zoom
         </div>
       </div>
 
